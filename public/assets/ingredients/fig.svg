@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 5. 자비 · 과일 - 무화과 -->
+  <path d="M 22 8 C 22 16 26 18 28 22 C 38 26 40 40 34 48 C 28 56 12 56 8 46 C 4 36 12 26 18 22 C 20 18 22 14 22 8 Z"
+        fill="#8E4F7A" stroke="#56284A" stroke-width="2.4" stroke-linejoin="round"/>
+  <path d="M 13 34 C 13 29 16 26 19 25" fill="none" stroke="#C48BB3" stroke-width="2.4" stroke-linecap="round" opacity="0.8"/>
+  <path d="M 22 8 L 21 4" stroke="#5E6B3A" stroke-width="2.6" stroke-linecap="round"/>
+  <g transform="translate(44 40)">
+    <path d="M 0 -18 C 8 -12 15 -4 15 5 C 15 13 8 18 0 18 C -8 18 -15 13 -15 5 C -15 -4 -8 -12 0 -18 Z" fill="#A9C27A" stroke="#56284A" stroke-width="2.2" stroke-linejoin="round"/>
+    <path d="M 0 -13 C 6 -8 11 -2 11 5 C 11 11 6 14 0 14 C -6 14 -11 11 -11 5 C -11 -2 -6 -8 0 -13 Z" fill="#F07A8A"/>
+    <path d="M 0 -6 C 4 -2 6 3 5 8 C 2 10 -2 10 -5 8 C -6 3 -4 -2 0 -6 Z" fill="#C2405A"/>
+    <g fill="#FFE2A6">
+      <circle cx="-6" cy="2" r="0.9"/><circle cx="6" cy="2" r="0.9"/><circle cx="-4" cy="9" r="0.9"/><circle cx="4" cy="9" r="0.9"/>
+      <circle cx="0" cy="-2" r="0.9"/><circle cx="-8" cy="7" r="0.9"/><circle cx="8" cy="7" r="0.9"/><circle cx="0" cy="11" r="0.9"/>
+    </g>
+  </g>
+</svg>

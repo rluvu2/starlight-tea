@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 1. 사랑 · 찻잎 - 홍차 -->
+  <ellipse cx="30" cy="54" rx="22" ry="4.5" fill="#2A160F" opacity="0.35"/>
+  <g stroke="#3E1E14" stroke-width="2" stroke-linejoin="round">
+    <path d="M 8 50 C 10 39 21 36 26 43 C 22 48 15 52 8 50 Z" fill="#7A3B27"/>
+    <path d="M 21 52 C 21 39 34 34 39 43 C 35 49 28 53 21 52 Z" fill="#934A32"/>
+    <path d="M 35 51 C 37 39 49 37 54 45 C 48 51 41 53 35 51 Z" fill="#6E3322"/>
+    <path d="M 16 41 C 18 30 29 27 33 34 C 29 40 23 42 16 41 Z" fill="#A0553A"/>
+    <path d="M 31 39 C 34 29 45 28 48 35 C 43 40 37 41 31 39 Z" fill="#82402A"/>
+  </g>
+  <g stroke="#D07656" stroke-width="1.5" stroke-linecap="round" fill="none" opacity="0.85">
+    <path d="M 11 48 C 15 44 19 43 23 43"/>
+    <path d="M 24 49 C 28 44 32 43 36 43"/>
+    <path d="M 19 39 C 23 35 27 34 31 35"/>
+    <path d="M 38 49 C 42 45 46 44 51 45"/>
+  </g>
+  <path d="M 48 6 C 53 13 56 18 56 21 A 8 8 0 0 1 40 21 C 40 18 43 13 48 6 Z" fill="#C8452F" stroke="#7E2416" stroke-width="2.2"/>
+  <ellipse cx="44.6" cy="19" rx="1.8" ry="3" fill="#FFD3C2" opacity="0.85"/>
+</svg>

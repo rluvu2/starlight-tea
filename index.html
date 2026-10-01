@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-visual" />
+    <title>별빛 찻집</title>
+    <meta name="description" content="지친 손님의 사연을 듣고 마음에 맞는 차를 우려 건네는 모바일 힐링 스토리 게임. 내 고민을 털어놓으면 팽주가 어울리는 차를 권해 줍니다." />
+    <meta name="theme-color" content="#060a1d" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="별빛 찻집" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="별빛 찻집" />
+    <meta property="og:description" content="지친 마음에 따뜻한 차 한 잔을 건네는 힐링 스토리 게임" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&display=swap" />
+
+    <!-- ADSENSE:START  Google H5 Games Ads (Ad Placement API)
+         - 게시자 ID는 .env 의 VITE_ADSENSE_CLIENT 에 적습니다. 비어 있으면 이 블록은 빌드에서 빠집니다.
+         - 개발 서버(npm run dev)에서는 테스트 광고(data-adbreak-test="on"), 배포 빌드에서는 자동으로 제거됩니다.
+         - onerror: 광고 차단기 등으로 스크립트를 못 받으면 즉시 알아채고 유저를 기다리게 하지 않습니다. -->
+    <script async
+      data-ad-client="%VITE_ADSENSE_CLIENT%"
+      data-adbreak-test="on"
+      src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+      crossorigin="anonymous"
+      onerror="window.__adsBlocked = true"></script>
+    <script>
+      window.adsbygoogle = window.adsbygoogle || [];
+      window.adBreak = window.adConfig = function (o) { adsbygoogle.push(o); };
+      adConfig({ preloadAdBreaks: 'on', sound: 'on' });
+    </script>
+    <!-- ADSENSE:END -->
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>
+      <h1>별빛 찻집</h1>
+      <p>지친 손님의 사연을 듣고 마음에 맞는 차를 우려 건네는 모바일 힐링 스토리 게임입니다. 플레이하려면 자바스크립트를 켜 주세요.</p>
+      <p><a href="about.html">게임 소개</a> · <a href="privacy.html">개인정보처리방침</a></p>
+    </noscript>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>

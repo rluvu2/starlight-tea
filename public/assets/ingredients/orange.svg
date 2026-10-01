@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 2. 희락 · 과일 - 오렌지 -->
+  <circle cx="27" cy="34" r="20" fill="#F39A2E" stroke="#A85C12" stroke-width="2.4"/>
+  <ellipse cx="19" cy="25" rx="5" ry="3" fill="#FFD49A" opacity="0.8" transform="rotate(-35 19 25)"/>
+  <g fill="#D97B16" opacity="0.6"><circle cx="21" cy="38" r="1.1"/><circle cx="31" cy="42" r="1.1"/><circle cx="35" cy="30" r="1.1"/><circle cx="25" cy="46" r="1.1"/></g>
+  <path d="M 27 14 L 28 9" stroke="#6E5A2E" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M 28 10 C 32 3 41 3 44 7 C 39 12 32 12 28 10 Z" fill="#7DB35F" stroke="#4E7A3A" stroke-width="2" stroke-linejoin="round"/>
+  <g transform="translate(47 46)">
+    <circle r="13" fill="#FFF3DC" stroke="#A85C12" stroke-width="2.2"/>
+    <circle r="10.5" fill="#FBB04C"/>
+    <g stroke="#FFF3DC" stroke-width="1.6" stroke-linecap="round">
+      <path d="M 0 0 L 0 -10"/><path d="M 0 0 L 8.5 -5"/><path d="M 0 0 L 8.5 5"/><path d="M 0 0 L 0 10"/><path d="M 0 0 L -8.5 5"/><path d="M 0 0 L -8.5 -5"/>
+    </g>
+    <circle r="1.8" fill="#FFF3DC"/>
+  </g>
+</svg>

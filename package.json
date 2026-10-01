@@ -1,0 +1,24 @@
+{
+  "name": "starlight-teahouse",
+  "private": true,
+  "version": "2.0.0",
+  "description": "별빛 찻집 - 모바일 우선 힐링 인터랙티브 스토리 게임",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "node scripts/check-data.mjs && vite build",
+    "preview": "vite preview --host",
+    "check": "node scripts/check-data.mjs"
+  },
+  "dependencies": {
+    "framer-motion": "^13.4.6",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-react": "^6.1.1",
+    "tailwindcss": "^4.3.3",
+    "vite": "^8.3.1"
+  }
+}

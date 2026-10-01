@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 8. 온유 · 과일 - 배 (둥근 우리 배) -->
+  <defs>
+    <radialGradient id="pearFill" cx="0.38" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#F4E2A4"/>
+      <stop offset="0.65" stop-color="#E2C278"/>
+      <stop offset="1" stop-color="#C9A055"/>
+    </radialGradient>
+  </defs>
+  <circle cx="32" cy="37" r="22" fill="url(#pearFill)" stroke="#8C6A2E" stroke-width="2.4"/>
+  <g fill="#B58C45" opacity="0.55">
+    <circle cx="22" cy="40" r="1"/><circle cx="28" cy="47" r="1"/><circle cx="38" cy="44" r="1"/><circle cx="44" cy="36" r="1"/>
+    <circle cx="35" cy="30" r="1"/><circle cx="26" cy="31" r="1"/><circle cx="32" cy="52" r="1"/><circle cx="46" cy="47" r="1"/>
+  </g>
+  <ellipse cx="22" cy="28" rx="5" ry="3.2" fill="#FFF6D6" opacity="0.8" transform="rotate(-35 22 28)"/>
+  <path d="M 32 15 C 32 11 33 8 35 6" fill="none" stroke="#6E5A2E" stroke-width="2.6" stroke-linecap="round"/>
+  <path d="M 34 9 C 39 2 49 3 52 8 C 46 13 39 12 34 9 Z" fill="#7DB35F" stroke="#4E7A3A" stroke-width="2" stroke-linejoin="round"/>
+</svg>

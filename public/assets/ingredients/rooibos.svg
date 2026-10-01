@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 5. 자비 · 찻잎 - 루이보스 (붉은 바늘잎) -->
+  <ellipse cx="32" cy="53" rx="25" ry="5" fill="#3A1A10" opacity="0.3"/>
+  <path d="M 6 52 C 10 36 22 26 32 26 C 42 26 54 36 58 52 Z" fill="#A8462A" stroke="#6E2814" stroke-width="2.2" stroke-linejoin="round"/>
+  <g stroke-width="2.4" stroke-linecap="round">
+    <path d="M 14 46 l 6 -4" stroke="#D86F45"/><path d="M 22 44 l 5 3" stroke="#E07D52"/><path d="M 30 42 l 6 -3" stroke="#C85B36"/>
+    <path d="M 38 45 l 5 2" stroke="#E07D52"/><path d="M 46 46 l 5 -4" stroke="#D86F45"/><path d="M 18 38 l 5 3" stroke="#C85B36"/>
+    <path d="M 26 35 l 6 -2" stroke="#E68A5D"/><path d="M 35 34 l 4 4" stroke="#D86F45"/><path d="M 42 38 l 5 -3" stroke="#E68A5D"/>
+    <path d="M 30 30 l 5 1" stroke="#EA9468"/><path d="M 24 49 l 5 -1" stroke="#8E3720"/><path d="M 36 50 l 5 -2" stroke="#8E3720"/>
+  </g>
+  <path d="M 44 22 C 46 14 52 10 58 10 C 56 17 51 21 44 22 Z" fill="#7DB35F" stroke="#4E7A3A" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 44 22 C 48 18 52 15 56 12" fill="none" stroke="#4E7A3A" stroke-width="1.4" stroke-linecap="round"/>
+</svg>

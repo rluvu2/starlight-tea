@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 싹을 기다리는 다람쥐 (guest_003) · 마음이 따뜻해진 표정 -->
+  <defs>
+    <linearGradient id="tail" gradientUnits="userSpaceOnUse" x1="330" y1="530" x2="420" y2="60">
+      <stop offset="0" stop-color="#C46F37"/>
+      <stop offset="1" stop-color="#E39A5C"/>
+    </linearGradient>
+    <radialGradient id="fur" cx="0.42" cy="0.35" r="0.75">
+      <stop offset="0" stop-color="#DB8C51"/>
+      <stop offset="1" stop-color="#BF6F3A"/>
+    </radialGradient>
+  </defs>
+
+  <!-- 꼬리 (등 뒤에서 머리 위로 말려 올라감): 원을 외곽선 → 채움 순서로 겹쳐 복슬복슬한 실루엣을 만듦 -->
+  <g stroke="#7A4524" stroke-width="12" fill="#7A4524">
+    <circle cx="316" cy="476" r="56"/><circle cx="366" cy="430" r="60"/><circle cx="404" cy="376" r="60"/>
+    <circle cx="428" cy="316" r="58"/><circle cx="436" cy="254" r="56"/><circle cx="428" cy="194" r="54"/>
+    <circle cx="406" cy="142" r="50"/><circle cx="372" cy="108" r="44"/><circle cx="334" cy="98" r="36"/>
+  </g>
+  <g fill="url(#tail)">
+    <circle cx="316" cy="476" r="56"/><circle cx="366" cy="430" r="60"/><circle cx="404" cy="376" r="60"/>
+    <circle cx="428" cy="316" r="58"/><circle cx="436" cy="254" r="56"/><circle cx="428" cy="194" r="54"/>
+    <circle cx="406" cy="142" r="50"/><circle cx="372" cy="108" r="44"/><circle cx="334" cy="98" r="36"/>
+  </g>
+  <path d="M 340 104 C 380 104 414 132 424 180 C 436 236 432 300 412 356 C 396 400 368 432 328 458"
+        fill="none" stroke="#F2BE8A" stroke-width="30" stroke-linecap="round" opacity="0.5"/>
+  <g fill="none" stroke="#A85E2E" stroke-width="5" stroke-linecap="round" opacity="0.55">
+    <path d="M 454 236 q 12 8 8 22"/><path d="M 446 318 q 12 10 6 24"/><path d="M 420 400 q 8 12 0 24"/>
+    <path d="M 436 156 q 14 4 14 18"/><path d="M 382 72 q 14 0 20 12"/>
+  </g>
+
+  <!-- 몸통 -->
+  <path d="M 104 520 C 110 430 156 372 214 356 L 298 356 C 356 372 402 430 408 520 Z"
+        fill="url(#fur)" stroke="#7A4524" stroke-width="6" stroke-linejoin="round"/>
+  <ellipse cx="256" cy="460" rx="84" ry="96" fill="#F4DEC0"/>
+  <!-- 초록 손수건 -->
+  <path d="M 200 352 Q 256 380 312 352 L 300 386 Q 256 404 212 386 Z" fill="#86AE72" stroke="#55784A" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 238 384 L 256 436 L 274 384 Z" fill="#86AE72" stroke="#55784A" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="230" cy="372" r="3.5" fill="#E9F2DE"/><circle cx="282" cy="372" r="3.5" fill="#E9F2DE"/><circle cx="256" cy="404" r="3.5" fill="#E9F2DE"/>
+
+  <!-- 귀 -->
+  <path d="M 150 150 C 132 108 140 70 164 52 C 192 70 216 98 226 120 Z" fill="#C97A43" stroke="#7A4524" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 362 150 C 380 108 372 70 348 52 C 320 70 296 98 286 120 Z" fill="#C97A43" stroke="#7A4524" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 162 132 C 152 108 156 86 168 74 C 186 88 200 104 206 118 Z" fill="#F0B79A"/>
+  <path d="M 350 132 C 360 108 356 86 344 74 C 326 88 312 104 306 118 Z" fill="#F0B79A"/>
+  <!-- 귀 끝 털뭉치 -->
+  <path d="M 158 60 C 146 44 150 26 162 14 C 164 28 176 30 176 44 C 184 38 190 40 192 46 C 184 56 170 64 158 60 Z" fill="#8F5129" stroke="#6A3A1E" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 354 60 C 366 44 362 26 350 14 C 348 28 336 30 336 44 C 328 38 322 40 320 46 C 328 56 342 64 354 60 Z" fill="#8F5129" stroke="#6A3A1E" stroke-width="4" stroke-linejoin="round"/>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="226" rx="122" ry="112" fill="url(#fur)" stroke="#7A4524" stroke-width="6"/>
+  <!-- 볼과 주둥이 (크림색) -->
+  <path d="M 160 252 C 160 220 196 214 220 232 C 236 220 276 220 292 232 C 316 214 352 220 352 252 C 352 300 310 330 256 330 C 202 330 160 300 160 252 Z" fill="#F4DEC0"/>
+  <!-- 이마 줄무늬 -->
+  <path d="M 256 118 L 256 150 M 236 122 L 240 146 M 276 122 L 272 146" stroke="#A85E2E" stroke-width="6" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- 편안해진 눈썹 -->
+  <path d="M 192 174 Q 209 164 226 170" fill="none" stroke="#7A4524" stroke-width="6" stroke-linecap="round"/>
+  <path d="M 320 174 Q 303 164 286 170" fill="none" stroke="#7A4524" stroke-width="6" stroke-linecap="round"/>
+  <!-- 웃는 눈 -->
+  <path d="M 192 220 Q 210 198 228 220" fill="none" stroke="#2B1A12" stroke-width="7.5" stroke-linecap="round"/>
+  <path d="M 284 220 Q 302 198 320 220" fill="none" stroke="#2B1A12" stroke-width="7.5" stroke-linecap="round"/>
+  <!-- 코, 입, 앞니 -->
+  <path d="M 244 246 Q 256 240 268 246 Q 264 256 256 258 Q 248 256 244 246 Z" fill="#4A2A1B"/>
+  <path d="M 256 258 L 256 265 M 236 266 Q 246 280 256 265 Q 266 280 276 266" fill="none" stroke="#4A2A1B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 249 272 L 249 284 Q 256 288 263 284 L 263 272" fill="#FFFFFF" stroke="#C9B6A0" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M 256 273 L 256 285" stroke="#C9B6A0" stroke-width="2"/>
+  <!-- 볼터치 -->
+  <ellipse cx="180" cy="262" rx="18" ry="10" fill="#EE9C8E" opacity="0.8"/>
+  <ellipse cx="332" cy="262" rx="18" ry="10" fill="#EE9C8E" opacity="0.8"/>
+
+  <!-- 싹이 나지 않은 화분을 든 두 손 -->
+  <path d="M 206 372 L 306 372 L 292 446 Q 256 456 220 446 Z" fill="#CF7F60" stroke="#8A4A34" stroke-width="5" stroke-linejoin="round"/>
+  <rect x="198" y="360" width="116" height="22" rx="8" fill="#DA8D6D" stroke="#8A4A34" stroke-width="5"/>
+  <ellipse cx="256" cy="362" rx="48" ry="7" fill="#5B3A29"/>
+  <circle cx="242" cy="360" r="2.5" fill="#7B5340"/><circle cx="266" cy="363" r="2" fill="#7B5340"/>
+  <ellipse cx="206" cy="398" rx="22" ry="17" fill="#D9874D" stroke="#7A4524" stroke-width="5"/>
+  <ellipse cx="306" cy="398" rx="22" ry="17" fill="#D9874D" stroke="#7A4524" stroke-width="5"/>
+  <!-- 흙 속에서 무언가 자라고 있다는 작은 반짝임 -->
+  <path d="M 256 326 C 258 338 262 342 274 344 C 262 346 258 350 256 362 C 254 350 250 346 238 344 C 250 342 254 338 256 326 Z" fill="#FFE8A3" stroke="#E8B860" stroke-width="2.5" stroke-linejoin="round"/>
+</svg>

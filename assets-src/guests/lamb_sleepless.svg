@@ -1,0 +1,99 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 잠 못 드는 아기 양 (guest_002) -->
+  <defs>
+    <linearGradient id="pajama" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#B4C3EE"/>
+      <stop offset="1" stop-color="#94A6DA"/>
+    </linearGradient>
+    <radialGradient id="face" cx="0.45" cy="0.4" r="0.7">
+      <stop offset="0" stop-color="#FBEFE3"/>
+      <stop offset="1" stop-color="#EED8C4"/>
+    </radialGradient>
+    <linearGradient id="cap" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#5A6BB4"/>
+      <stop offset="1" stop-color="#3E4C8E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 몸통: 별무늬 잠옷 -->
+  <path d="M 92 520 C 100 428 150 374 212 360 L 300 360 C 362 374 412 428 420 520 Z"
+        fill="url(#pajama)" stroke="#6576AE" stroke-width="6" stroke-linejoin="round"/>
+  <g fill="#F7DA8E">
+    <path d="M 150 452 l 5 10 l 11 1 l -8 7 l 3 11 l -11 -6 l -10 6 l 2 -11 l -8 -7 l 11 -1 z"/>
+    <path d="M 352 430 l 4 8 l 9 1 l -7 6 l 2 9 l -8 -5 l -8 5 l 2 -9 l -7 -6 l 9 -1 z"/>
+    <path d="M 196 482 l 3 6 l 7 1 l -5 4 l 2 7 l -7 -4 l -6 4 l 1 -7 l -5 -4 l 7 -1 z"/>
+    <path d="M 330 488 a 13 13 0 1 0 12 -16 a 10 10 0 1 1 -12 16 z"/>
+  </g>
+  <!-- 잠옷 단추 -->
+  <circle cx="256" cy="420" r="7" fill="#F4F1FA" stroke="#6576AE" stroke-width="3"/>
+  <circle cx="256" cy="458" r="7" fill="#F4F1FA" stroke="#6576AE" stroke-width="3"/>
+  <!-- 잠옷 둥근 깃 -->
+  <path d="M 200 362 Q 200 404 252 396 L 256 372 Z" fill="#F4F1FA" stroke="#6576AE" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M 312 362 Q 312 404 260 396 L 256 372 Z" fill="#F4F1FA" stroke="#6576AE" stroke-width="5" stroke-linejoin="round"/>
+
+  <!-- 축 처진 귀 -->
+  <ellipse cx="112" cy="258" rx="50" ry="22" transform="rotate(-18 112 258)" fill="#EDC9B6" stroke="#B88E79" stroke-width="5"/>
+  <ellipse cx="400" cy="258" rx="50" ry="22" transform="rotate(18 400 258)" fill="#EDC9B6" stroke="#B88E79" stroke-width="5"/>
+  <ellipse cx="114" cy="258" rx="32" ry="10" transform="rotate(-18 114 258)" fill="#F4ABAE" opacity="0.8"/>
+  <ellipse cx="398" cy="258" rx="32" ry="10" transform="rotate(18 398 258)" fill="#F4ABAE" opacity="0.8"/>
+
+  <!-- 복슬복슬 털: 외곽선 → 채움 순서로 겹쳐 그려 안쪽 선을 지움 -->
+  <g stroke="#CFC2AB" stroke-width="10" fill="#CFC2AB">
+    <circle cx="256" cy="112" r="46"/><circle cx="314" cy="124" r="44"/><circle cx="356" cy="164" r="44"/>
+    <circle cx="372" cy="218" r="42"/><circle cx="360" cy="272" r="42"/><circle cx="326" cy="314" r="42"/>
+    <circle cx="256" cy="330" r="44"/><circle cx="186" cy="314" r="42"/><circle cx="152" cy="272" r="42"/>
+    <circle cx="140" cy="218" r="42"/><circle cx="156" cy="164" r="44"/><circle cx="198" cy="124" r="44"/>
+  </g>
+  <g fill="#FBF7EE">
+    <circle cx="256" cy="112" r="46"/><circle cx="314" cy="124" r="44"/><circle cx="356" cy="164" r="44"/>
+    <circle cx="372" cy="218" r="42"/><circle cx="360" cy="272" r="42"/><circle cx="326" cy="314" r="42"/>
+    <circle cx="256" cy="330" r="44"/><circle cx="186" cy="314" r="42"/><circle cx="152" cy="272" r="42"/>
+    <circle cx="140" cy="218" r="42"/><circle cx="156" cy="164" r="44"/><circle cx="198" cy="124" r="44"/>
+    <circle cx="256" cy="220" r="110"/>
+  </g>
+  <g fill="#FFFFFF" opacity="0.9">
+    <circle cx="170" cy="150" r="12"/><circle cx="150" cy="196" r="8"/>
+  </g>
+
+  <!-- 얼굴 -->
+  <ellipse cx="256" cy="238" rx="80" ry="88" fill="url(#face)" stroke="#C9A992" stroke-width="5"/>
+  <!-- 앞머리 털 -->
+  <g fill="#FBF7EE" stroke="#CFC2AB" stroke-width="4">
+    <circle cx="214" cy="160" r="26"/><circle cx="298" cy="160" r="26"/><circle cx="256" cy="150" r="30"/>
+  </g>
+  <g fill="#FBF7EE">
+    <circle cx="232" cy="150" r="20"/><circle cx="280" cy="150" r="20"/>
+  </g>
+
+  <!-- 수면 모자 -->
+  <path d="M 150 168 C 150 94 214 52 280 58 C 352 64 408 118 418 214 C 396 170 368 146 348 150 C 360 158 364 166 364 172 C 300 138 214 138 150 168 Z"
+        fill="url(#cap)" stroke="#2F3A72" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 146 172 C 214 138 300 138 366 174" fill="none" stroke="#E9ECFA" stroke-width="16" stroke-linecap="round"/>
+  <path d="M 146 172 C 214 138 300 138 366 174" fill="none" stroke="#B9C1E6" stroke-width="4" stroke-linecap="round" stroke-dasharray="1 14"/>
+  <g fill="#F7DA8E">
+    <path d="M 226 92 l 4 8 l 9 1 l -7 6 l 2 9 l -8 -5 l -8 5 l 2 -9 l -7 -6 l 9 -1 z"/>
+    <path d="M 300 86 l 3 6 l 7 1 l -5 4 l 1 7 l -6 -4 l -6 4 l 1 -7 l -5 -4 l 7 -1 z"/>
+    <path d="M 366 128 l 3 6 l 6 1 l -4 4 l 1 6 l -6 -3 l -5 3 l 1 -6 l -4 -4 l 6 -1 z"/>
+  </g>
+  <circle cx="420" cy="222" r="24" fill="#FFF6DA" stroke="#D9C38E" stroke-width="5"/>
+
+  <!-- 동그랗게 뜬 눈 -->
+  <circle cx="222" cy="232" r="16" fill="#2A2440"/>
+  <circle cx="290" cy="232" r="16" fill="#2A2440"/>
+  <circle cx="217" cy="226" r="6" fill="#FFFFFF"/>
+  <circle cx="285" cy="226" r="6" fill="#FFFFFF"/>
+  <circle cx="227" cy="238" r="2.5" fill="#FFFFFF"/>
+  <circle cx="295" cy="238" r="2.5" fill="#FFFFFF"/>
+  <!-- 다크서클 -->
+  <path d="M 204 256 Q 222 264 240 256" fill="none" stroke="#9C90C6" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <path d="M 272 256 Q 290 264 308 256" fill="none" stroke="#9C90C6" stroke-width="4" stroke-linecap="round" opacity="0.7"/>
+  <!-- 걱정 눈썹 -->
+  <path d="M 204 198 Q 218 196 234 188" fill="none" stroke="#B58F79" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 308 198 Q 294 196 278 188" fill="none" stroke="#B58F79" stroke-width="5" stroke-linecap="round"/>
+  <!-- 코와 입 -->
+  <path d="M 246 270 Q 256 266 266 270 Q 262 280 256 281 Q 250 280 246 270 Z" fill="#E7959D"/>
+  <path d="M 242 296 Q 249 290 256 296 Q 263 302 270 296" fill="none" stroke="#9A6A64" stroke-width="4" stroke-linecap="round"/>
+  <!-- 볼터치 -->
+  <ellipse cx="194" cy="276" rx="16" ry="9" fill="#F2A3A8" opacity="0.55"/>
+  <ellipse cx="318" cy="276" rx="16" ry="9" fill="#F2A3A8" opacity="0.55"/>
+</svg>

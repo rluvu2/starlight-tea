@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 6. 양선 · 찻잎 - 녹차 (갓 딴 찻잎) -->
+  <path d="M 32 60 C 32 48 32 38 32 26" fill="none" stroke="#5E8C42" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 32 44 C 20 48 8 42 6 30 C 18 26 30 32 32 44 Z" fill="#8CC56A" stroke="#4E7A3A" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 32 40 C 44 44 56 38 58 26 C 46 22 34 28 32 40 Z" fill="#7DB85C" stroke="#4E7A3A" stroke-width="2.2" stroke-linejoin="round"/>
+  <path d="M 32 27 C 25 20 25 10 32 4 C 39 10 39 20 32 27 Z" fill="#A9D686" stroke="#4E7A3A" stroke-width="2.2"/>
+  <g fill="none" stroke="#4E7A3A" stroke-width="1.4" stroke-linecap="round" opacity="0.8">
+    <path d="M 31 43 C 24 41 16 37 10 31"/><path d="M 33 39 C 40 37 48 33 54 27"/><path d="M 32 25 L 32 9"/>
+    <path d="M 22 39 l -2 4 M 16 35 l -3 3 M 42 35 l 2 4 M 49 31 l 3 3"/>
+  </g>
+  <ellipse cx="14" cy="32" rx="2.4" ry="1.4" fill="#E2F5C9" opacity="0.8" transform="rotate(25 14 32)"/>
+</svg>

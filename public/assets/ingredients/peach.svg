@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 3. 화평 · 과일 - 복숭아 -->
+  <defs>
+    <radialGradient id="peachFill" cx="0.35" cy="0.35" r="0.8">
+      <stop offset="0" stop-color="#FFD3B4"/>
+      <stop offset="0.6" stop-color="#F9A88E"/>
+      <stop offset="1" stop-color="#EE7F80"/>
+    </radialGradient>
+  </defs>
+  <path d="M 32 18 C 22 12 8 18 8 34 C 8 48 20 56 32 56 C 44 56 56 48 56 34 C 56 18 42 12 32 18 Z" fill="url(#peachFill)" stroke="#B9565C" stroke-width="2.5"/>
+  <path d="M 32 19 C 26 28 26 44 32 55" fill="none" stroke="#D86E72" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+  <ellipse cx="20" cy="30" rx="4" ry="6" fill="#FFF0E2" opacity="0.6" transform="rotate(20 20 30)"/>
+  <path d="M 32 18 L 33 11" stroke="#6E5A3A" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 33 12 C 38 4 50 4 54 9 C 48 15 38 15 33 12 Z" fill="#7DB36A" stroke="#4E7A3A" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M 36 11 C 42 9 47 8 51 9" fill="none" stroke="#4E7A3A" stroke-width="1.5" stroke-linecap="round"/>
+</svg>
