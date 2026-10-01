@@ -7,10 +7,11 @@ import { launchMeteors } from '../../components/NightSky.jsx';
 import SparkleBurst from '../../components/SparkleBurst.jsx';
 import { SparkleIcon, StarIcon } from '../../components/icons.jsx';
 import { GlassCup, Steam } from '../../components/teaware.jsx';
-import { GUEST_TEXT, OWNER_NAME, PICK_TEXT } from '../../data/scripts.js';
+import { GUEST_TEXT, LEVEL_NAMES, OWNER_NAME, PICK_TEXT } from '../../data/scripts.js';
 import { PHASE, useGameState } from '../../hooks/useGameState.js';
 import { skipTyping, useTypewriter } from '../../hooks/useTypewriter.js';
 import { blendColor, PICK } from '../../logic/blend.js';
+import { levelName, levelStars } from '../../logic/format.js';
 import { guestById } from '../../logic/gameData.js';
 import { fill } from '../../logic/josa.js';
 import { haptic } from '../../utils/haptics.js';
@@ -144,10 +145,11 @@ export function GuestCup() {
  * 손님의 말풍선. hint 가 있으면 말을 다 한 뒤 아래에 팽주의 귀띔을 덧붙인다.
  * (작은 화면에서는 재료 칸 위에 귀띔을 둘 자리가 없어서 말풍선 안에 둔다)
  */
-function SpeechBubble({ line, guestName, hint }) {
+function SpeechBubble({ line, guestName, level, hint }) {
   const reduceMotion = useReducedMotion();
   const { shown, done } = useTypewriter(line.text, { instant: reduceMotion, speed: 32, skippable: true });
   const nameTag = line.speaker === 'guest' ? guestName : line.speaker === 'owner' ? OWNER_NAME : null;
+  const showLevel = line.speaker === 'guest' && Number.isInteger(level);
   return (
     // 타자 중에 누르면 대사를 끝까지 바로 보여 준다
     <div
@@ -157,8 +159,14 @@ function SpeechBubble({ line, guestName, hint }) {
       }`}
     >
       {nameTag && (
-        <span className="absolute -top-3 left-4 max-w-[80%] truncate rounded-full bg-lamp-300 px-3 py-0.5 font-serif text-[12.5px] font-bold text-night-900 shadow-md">
-          {nameTag}
+        <span className="absolute -top-3 left-4 flex max-w-[80%] items-center gap-1.5 rounded-full bg-lamp-300 px-3 py-0.5 font-serif text-[12.5px] font-bold text-night-900 shadow-md">
+          <span className="truncate">{nameTag}</span>
+          {/* 손님의 난이도: ★ 쉬움 · ★★ 보통 · ★★★ 어려움 */}
+          {showLevel && (
+            <span className="shrink-0 text-[10px] tracking-[-0.08em] text-[#a8641c]" aria-label={`${levelName(level, LEVEL_NAMES)} 단계 손님`}>
+              {levelStars(level)}
+            </span>
+          )}
         </span>
       )}
       <p
@@ -273,7 +281,7 @@ export function GuestOverlay() {
   return (
     <m.div className="pointer-events-none absolute inset-0 z-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="absolute inset-x-4 top-[min(12cqw,52px)]">
-        <SpeechBubble line={guest.line} guestName={data.name} hint={guest.step === 'missed' ? guest.hint : null} />
+        <SpeechBubble line={guest.line} guestName={data.name} level={data.level} hint={guest.step === 'missed' ? guest.hint : null} />
       </div>
       <div
         ref={anchor}

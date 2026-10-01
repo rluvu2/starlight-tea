@@ -2,7 +2,7 @@ import { AnimatePresence, m } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { playSfx } from '../audio/engine.js';
-import { AD_GATE_TEXT, ADVICE_TEXT, GUEST_TEXT, PICK_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
+import { AD_GATE_TEXT, ADVICE_TEXT, FIRST_TRY_REWARD_TEXT, GUEST_TEXT, PICK_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
 import { isGuestReady, isReflectionReady, PHASE, useGameState } from '../hooks/useGameState.js';
 import { skipTyping } from '../hooks/useTypewriter.js';
 import { partOf, PICK } from '../logic/blend.js';
@@ -44,7 +44,9 @@ function usePanelModel() {
     }
     return {
       tabs: comforted ? null : { onChange: actions.setPickMode, leafId: guest.leafId, fruitId: guest.fruitId, solved: guest.solved },
-      header: comforted ? { text: fill(STAR_REWARD_TEXT, { name: guestData?.name ?? '' }), reward: guest.reward } : null,
+      header: comforted
+        ? { text: fill(guest.firstTry ? FIRST_TRY_REWARD_TEXT : STAR_REWARD_TEXT, { name: guestData?.name ?? '' }), reward: guest.reward }
+        : null,
       mode: guest.pickMode,
       view: (mode) => ({
         selectable: choosing && !guest.solved[mode],

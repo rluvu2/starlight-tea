@@ -7,8 +7,10 @@ import { fileURLToPath } from 'node:url';
 import { BLEND_RULE, BLEND_TEXT } from '../src/data/blending.js';
 import { GUESTS, MISS_DIALOGUES } from '../src/data/guests.js';
 import { INGREDIENTS } from '../src/data/ingredients.js';
+import { LEVEL_NAMES } from '../src/data/scripts.js';
 import { TRAIN_DATA } from '../src/data/trainData.js';
 import { happyFileName } from '../src/logic/fileNames.js';
+import { levelName } from '../src/logic/format.js';
 import { validateBlendData, validateGameData, validateTrainData } from '../src/logic/validateData.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -85,9 +87,8 @@ for (const page of ['about.html', 'privacy.html']) {
 }
 
 // ── 결과 ──
-const LEVEL_NAMES = { 1: '쉬움', 2: '보통', 3: '어려움' };
 const levels = [...new Set(guests.map((guest) => guest.level))].sort((a, b) => a - b);
-const levelSummary = levels.map((level) => `${LEVEL_NAMES[level] ?? `${level}단계`} ${guests.filter((g) => g.level === level).length}`).join(' · ');
+const levelSummary = levels.map((level) => `${levelName(level, LEVEL_NAMES)} ${guests.filter((g) => g.level === level).length}`).join(' · ');
 const missCount = Object.values(missDialogues).reduce((sum, lines) => sum + lines.length, 0);
 console.log('\n별빛 찻집 · 데이터 검사');
 console.log(`  손님 ${guests.length}명${levelSummary ? ` (${levelSummary})` : ''} · 재료 ${ingredients.length}가지 · 아쉬울 때 대사 ${missCount}개`);

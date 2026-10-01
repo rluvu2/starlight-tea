@@ -6,8 +6,9 @@ import GuestImage from '../components/GuestImage.jsx';
 import { ChevronLeftIcon, SparkleIcon, StarIcon } from '../components/icons.jsx';
 import Sheet from '../components/Sheet.jsx';
 import { buildCollection, useGameState } from '../hooks/useGameState.js';
+import { LEVEL_NAMES } from '../data/scripts.js';
 import { blendName, blendParts } from '../logic/blend.js';
-import { formatDate } from '../logic/format.js';
+import { formatDate, levelName, levelStars } from '../logic/format.js';
 import { INGREDIENT_LIST } from '../logic/gameData.js';
 import { ingredientIconUrl } from '../utils/assets.js';
 import { haptic } from '../utils/haptics.js';
@@ -26,6 +27,18 @@ const cardBackground = (status) =>
     : 'radial-gradient(circle at 50% 38%, rgba(130,140,210,0.24), rgba(20,26,66,0.55) 72%)';
 
 const number = (n) => String(n).padStart(3, '0');
+
+/** 도감 번호와 난이도 별: "No.003 ★★" */
+function NumberChip({ entry, className }) {
+  return (
+    <span className={`absolute rounded-full bg-night-950/60 px-2 py-0.5 text-[10px] text-ink-300 ${className}`}>
+      No.{number(entry.number)}
+      <span className="ml-1 tracking-[-0.08em] text-lamp-300/90" aria-label={`${levelName(entry.guest.level, LEVEL_NAMES)} 단계`}>
+        {levelStars(entry.guest.level)}
+      </span>
+    </span>
+  );
+}
 
 function DetailSection({ label, children }) {
   return (
@@ -54,9 +67,7 @@ function GuestDetail({ entry, onClose }) {
     <Sheet title={status === 'unknown' ? '아직 만나지 못한 손님' : guest.name} onClose={onClose}>
       <div className="relative mx-auto aspect-square w-[62%] overflow-hidden rounded-3xl" style={{ background: cardBackground(status) }}>
         <GuestPortrait entry={entry} className="absolute bottom-[-8%] left-[4%] w-[92%]" />
-        <span className="absolute left-2.5 top-2.5 rounded-full bg-night-950/60 px-2 py-0.5 text-[10px] text-ink-300">
-          No.{number(entry.number)}
-        </span>
+        <NumberChip entry={entry} className="left-2.5 top-2.5" />
       </div>
 
       {status === 'unknown' ? (
@@ -122,9 +133,7 @@ function GuestGrid({ entries, onOpen }) {
         >
           <div className="relative aspect-square overflow-hidden rounded-2xl" style={{ background: cardBackground(entry.status) }}>
             <GuestPortrait entry={entry} className="absolute bottom-[-8%] left-[4%] w-[92%]" />
-            <span className="absolute left-2 top-2 rounded-full bg-night-950/60 px-2 py-0.5 text-[10px] text-ink-300">
-              No.{number(entry.number)}
-            </span>
+            <NumberChip entry={entry} className="left-2 top-2" />
             {entry.status === 'comforted' && (
               <span className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-lamp-300 text-night-900 shadow-[0_0_14px_rgba(255,208,138,0.7)]">
                 <StarIcon className="h-4 w-4" />

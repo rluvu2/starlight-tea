@@ -25,7 +25,7 @@ import { analyzeWorry, getClassifier } from '../logic/advisor.js';
 import { blendParts, PICK, tasteBlend } from '../logic/blend.js';
 import { GUEST_LIST, guestBlend, guestById, ingredientById, MISS_LINES } from '../logic/gameData.js';
 import { fill } from '../logic/josa.js';
-import { pickNextGuest } from '../logic/pickGuest.js';
+import { frontierLevel, pickNextGuest } from '../logic/pickGuest.js';
 import { pick, pickDifferent } from '../logic/random.js';
 import { requestRewardedAd } from '../utils/adService.js';
 
@@ -224,6 +224,7 @@ const newVisit = (guest) => ({
   hint: null, // { part: leaf|fruit, text }
   reward: 0,
   isNewEntry: false,
+  firstTry: false, // 처음 만난 손님에게 첫 잔으로 맞혔는지 (별조각 보너스)
 });
 
 export function createInitialState(save = createDefaultSave()) {
@@ -237,6 +238,7 @@ export function createInitialState(save = createDefaultSave()) {
     adStatus: 'idle', // Phase 3.5: idle | loading | dismissed
     lastMissLine: null, // 같은 대사가 연달아 나오지 않도록
     tonight: { guests: 0, teas: 0 }, // 로비에 보여 줄 오늘 밤의 기록 (저장하지 않음)
+    milestone: null, // 로비에서 한 번 알려 줄 소식 { kind: levelUp, level } | { kind: complete }
   };
 }
 
@@ -272,6 +274,7 @@ export function gameReducer(state, action) {
         phase: PHASE.GUEST,
         visitKey: state.visitKey + 1,
         guest: newVisit(guest),
+        milestone: null,
         save: {
           ...save,
           visits: { ...save.visits, [guest.id]: (save.visits[guest.id] ?? 0) + 1 },
@@ -320,9 +323,19 @@ export function gameReducer(state, action) {
 
       if (result === 'match') {
         // 찻잎과 과일이 둘 다 맞으면: 고유 위로 대사 + 별조각 획득 + 도감 해금
+        // 처음 만난 손님에게 첫 잔으로 맞히면 별조각 하나 더
         const previous = save.collection[guest.id];
         const isNewEntry = !previous;
-        const reward = STAR_REWARD.perfectMatch + (isNewEntry ? STAR_REWARD.firstComfort : 0);
+        const firstTry = isNewEntry && guest.misses === 0;
+        const reward = STAR_REWARD.perfectMatch + (isNewEntry ? STAR_REWARD.firstComfort : 0) + (firstTry ? STAR_REWARD.firstTry : 0);
+        const collection = {
+          ...save.collection,
+          [guest.id]: { firstAt: previous?.firstAt ?? action.now, count: (previous?.count ?? 0) + 1, ...served },
+        };
+        // 이 손님으로 한 단계의 손님을 모두 데웠다면, 로비에서 다음 단계가 열렸다고 알려 준다
+        const before = frontierLevel(GUEST_LIST, save.collection);
+        const after = frontierLevel(GUEST_LIST, collection);
+        const milestone = before === after ? null : after === null ? { kind: 'complete' } : { kind: 'levelUp', level: after };
         return {
           ...state,
           guest: {
@@ -333,17 +346,12 @@ export function gameReducer(state, action) {
             hint: null,
             reward,
             isNewEntry,
+            firstTry,
             line: { speaker: 'guest', text: data.perfect_match_dialogue },
           },
           tonight: { ...state.tonight, guests: state.tonight.guests + 1 },
-          save: {
-            ...save,
-            stars: save.stars + reward,
-            collection: {
-              ...save.collection,
-              [guest.id]: { firstAt: previous?.firstAt ?? action.now, count: (previous?.count ?? 0) + 1, ...served },
-            },
-          },
+          milestone,
+          save: { ...save, stars: save.stars + reward, collection },
         };
       }
 
@@ -388,7 +396,7 @@ export function gameReducer(state, action) {
 
     case 'START_REFLECTION':
       if (state.phase !== PHASE.CROSSROADS) return state;
-      return { ...state, phase: PHASE.REFLECTION, reflection: emptyReflection(), advice: null, adStatus: 'idle' };
+      return { ...state, phase: PHASE.REFLECTION, reflection: emptyReflection(), advice: null, adStatus: 'idle', milestone: null };
 
     case 'SET_PICK_MODE':
       if (!PICK_MODES.includes(action.mode)) return state;

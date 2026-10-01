@@ -164,7 +164,29 @@ for (const roll of [0, 0.5, 0.99]) assert.notEqual(pickNextGuest(GUEST_LIST, all
 const twins = [{ id: 'a', level: 1 }, { id: 'b', level: 1 }, { id: 'c', level: 2 }];
 assert.equal(pickNextGuest(twins, {}, () => 0).id, 'a'); assert.equal(pickNextGuest(twins, {}, () => 0.99).id, 'b', '같은 단계끼리는 무작위');
 assert.equal(pickNextGuest([], {}), null);
-console.log('✓ 손님: 찻잎+과일 내기, 맞힌 쪽 고정·알려 주기, 자리 바뀜, 귀띔(못 맞힌 쪽), 난이도 순서(쉬움→보통→어려움)');
+// 처음 만난 손님에게 첫 잔으로 맞히면 별조각 하나 더, 한 단계를 다 데우면 로비에서 소식
+const withComforted = (ids) => ({
+  ...createInitialState({ ...createDefaultSave(), collection: Object.fromEntries(ids.map((id) => [id, { firstAt: 1, count: 1, leafId: null, fruitId: null }])) }),
+  phase: PHASE.CROSSROADS,
+});
+const visit = (ids, guestId) => reduce(withComforted(ids), { type: 'START_GUEST', guestId });
+const cat = serve(visit([], 'guest_004'), 2, 1);
+assert.equal(cat.guest.step, 'comforted'); assert.equal(cat.guest.firstTry, true);
+assert.equal(cat.guest.reward, 4, '정답 1 + 첫 해금 2 + 한 번에 1'); assert.equal(cat.save.stars, 4);
+assert.equal(cat.milestone, null, '쉬운 손님이 아직 남았으면 소식 없음');
+assert.equal(serve(serve(visit([], 'guest_004'), 1, 1), 2, null).guest.firstTry, false, '두 잔째에 맞히면 보너스 없음');
+const revisit = serve(visit(['guest_004'], 'guest_004'), 2, 1);
+assert.equal(revisit.guest.firstTry, false); assert.equal(revisit.guest.reward, 1, '다시 찾아온 손님은 별조각 1개');
+let tier = serve(visit(['guest_002'], 'guest_004'), 2, 1);
+assert.deepEqual(tier.milestone, { kind: 'levelUp', level: 2 }, '쉬운 손님을 모두 데우면 보통 단계가 열린다');
+tier = reduce(tier, { type: 'TO_CROSSROADS' });
+assert.deepEqual(tier.milestone, { kind: 'levelUp', level: 2 }, '로비에서 보여 준다');
+assert.equal(reduce(tier, { type: 'START_GUEST', guestId: 'guest_003' }).milestone, null, '로비를 떠나면 지운다');
+assert.equal(reduce(tier, { type: 'START_REFLECTION' }).milestone, null);
+const allButRabbit = GUEST_LIST.map((g) => g.id).filter((id) => id !== 'guest_006');
+assert.deepEqual(serve(visit(allButRabbit, 'guest_006'), 6, 2).milestone, { kind: 'complete' }, '마지막 손님이면 모두 데웠다는 소식');
+assert.equal(serve(visit(GUEST_LIST.map((g) => g.id), 'guest_006'), 6, 2).milestone, null, '다시 들른 손님은 소식 없음');
+console.log('✓ 손님: 찻잎+과일 내기, 맞힌 쪽 고정·알려 주기, 자리 바뀜, 귀띔(못 맞힌 쪽), 난이도 순서(쉬움→보통→어려움), 한 번에 보너스, 단계 소식');
 
 // ── 1-b. 블렌딩 규칙 (2위가 1위의 20% 이상일 때만 과일로) ──
 const r = (pairs) => pairs.map(([label, share]) => ({ label, share }));

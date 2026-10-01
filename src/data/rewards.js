@@ -5,4 +5,5 @@
 export const STAR_REWARD = {
   perfectMatch: 1, // 정답 차를 대접할 때마다
   firstComfort: 2, // 그 손님의 마음을 처음 데웠을 때 추가로 (도감 해금 보너스)
+  firstTry: 1, // 처음 만난 손님에게 첫 잔으로 꼭 맞는 차를 냈을 때 추가로 ("한 번에 맞혔어요!")
 };

@@ -56,6 +56,11 @@ export const HINT_TEMPLATE = "가만히 보니, {hint}";
 
 // 정답 차를 대접해 별조각을 받았을 때
 export const STAR_REWARD_TEXT = "{name}{이/가} 고마움의 표시로 별조각을 남겼어요";
+// 처음 만난 손님에게 첫 잔으로 꼭 맞는 차를 냈을 때 (별조각을 하나 더 받아요. rewards.js 의 firstTry)
+export const FIRST_TRY_REWARD_TEXT = "한 번에 맞혔어요! {name}{이/가} 별조각을 하나 더 남겼어요";
+
+// 손님 난이도(guests.js 의 level) 이름. 이름표 옆 별(★)의 개수가 level 이에요
+export const LEVEL_NAMES = { 1: "쉬움", 2: "보통", 3: "어려움" };
 
 // ── Phase 2: 찻집 로비 (메인 메뉴 · 분기점) ─────────────────────────
 // 찻집 문을 열면 언제나 손님 맞이가 먼저이고, 첫 손님을 배웅한 뒤부터 로비가 열려요.
@@ -67,7 +72,16 @@ export const LOBBY_TEXT = {
   tonightGuests: "오늘 맞이한 손님 {count}명",
   tonightTeas: "나를 위한 차 {count}잔",
   nextGuest: "다음 손님 맞이하기",
-  nextGuestCaption: "별빛을 따라 새 손님이 찾아와요",
+  // 아직 마음을 데우지 못한 손님이 있을 때. {stars} 는 ★, {level} 은 난이도 이름
+  nextGuestCaption: "{stars} {level} 단계의 손님이 별빛을 따라와요",
+  // 모든 손님의 마음을 데운 뒤
+  revisitCaption: "반가운 손님이 다시 들를지도 몰라요",
+  // 한 단계의 손님을 모두 위로해 다음 단계가 열렸을 때 (로비에서 한 번)
+  levelUpTitle: "별빛이 조금 더 깊어졌어요.",
+  levelUpSubtitle: "이제 '{level}' 단계의 손님들이 찾아와요. 조금 더 깊은 고민을 품고 있대요.",
+  // 모든 손님의 마음을 데웠을 때 (로비에서 한 번)
+  completeTitle: "모든 손님의 마음을 데웠어요.",
+  completeSubtitle: "오늘 밤 찻집은 별빛으로 가득해요. 반가운 얼굴들이 가끔 다시 들를 거예요.",
   brewForMe: "나를 위한 차 끓이기",
   brewForMeCaption: "찻잎과 과일로 오늘의 내 마음을 블렌딩해요",
   collection: "손님 도감",
