@@ -27,6 +27,8 @@
   --animate-wave-fast: wave 0.9s linear infinite;
   --animate-stream: stream 0.5s linear infinite;
   --animate-float: float 5s ease-in-out infinite;
+  --animate-beckon: beckon 1.6s ease-in-out infinite;
+  --animate-nudge: nudge 1.2s ease-in-out infinite;
 
   @keyframes bulb {
     0%, 100% { opacity: 0.7; }
@@ -53,6 +55,15 @@
   @keyframes float {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-6px); }
+  }
+  /* 눌러 보라고 손짓하는 버튼의 빛 (처음 오신 분 안내) */
+  @keyframes beckon {
+    0%, 100% { box-shadow: 0 14px 34px -10px rgba(245, 184, 96, 0.75), 0 0 0 0 rgba(255, 208, 138, 0.55); }
+    50% { box-shadow: 0 14px 34px -10px rgba(245, 184, 96, 0.75), 0 0 0 10px rgba(255, 208, 138, 0); }
+  }
+  @keyframes nudge {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(4px); }
   }
 }
 

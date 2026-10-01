@@ -2,7 +2,7 @@ import { AnimatePresence, m } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { playSfx } from '../audio/engine.js';
-import { AD_GATE_TEXT, ADVICE_TEXT, FIRST_TRY_REWARD_TEXT, GUEST_TEXT, PICK_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
+import { AD_GATE_TEXT, ADVICE_TEXT, COACH_TEXT, FIRST_TRY_REWARD_TEXT, GUEST_TEXT, PICK_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
 import { isGuestReady, isReflectionReady, PHASE, useGameState } from '../hooks/useGameState.js';
 import { skipTyping } from '../hooks/useTypewriter.js';
 import { partOf, PICK } from '../logic/blend.js';
@@ -18,10 +18,19 @@ const softText = (color) => `color-mix(in srgb, ${color} 62%, white)`;
 const idFor = (blend, mode) => (blend ? (mode === PICK.FRUIT ? blend.fruitId : blend.leafId) : null);
 const FLIP_DELAY_MS = 260; // 재료를 고른 뒤 다음 탭으로 넘어가기 전, 고른 칸을 보여 주는 시간
 const SWIPE_MIN_PX = 44; // 이만큼 옆으로 밀면 탭을 넘긴다
+const LONG_PRESS_MS = 420; // 재료 칸을 이만큼 누르고 있으면 설명이 뜬다
 const OTHER_MODE = { [PICK.LEAF]: PICK.FRUIT, [PICK.FRUIT]: PICK.LEAF };
 
 /** 아직 비어 있는 쪽을 알려 주는 버튼 문구 (둘 다 골랐으면 null) */
 const missingPick = (picked) => (!picked.leafId ? PICK_TEXT.needLeaf : !picked.fruitId ? PICK_TEXT.needFruit : null);
+
+/** 처음 오신 분 안내: 지금 무엇을 하면 되는지 (COACH_TEXT 의 키, 안내가 필요 없으면 null) */
+function coachStep(guest) {
+  if (guest.step !== 'talking' && guest.step !== 'missed') return null;
+  if (guest.leafId && guest.fruitId) return 'serve';
+  if (guest.misses > 0) return 'retry';
+  return guest.leafId ? 'fruit' : 'leaf';
+}
 
 /**
  * 지금 Phase 에서 재료 칸과 메인 버튼이 어떻게 보일지 정한다.
@@ -36,13 +45,24 @@ function usePanelModel() {
     const guestData = guestById(guest.id);
     const choosing = guest.step === 'talking' || guest.step === 'missed';
     const comforted = guest.step === 'comforted';
+    // 아직 아무 손님의 마음도 데우지 못했다면 처음 오신 분이다 → 한 단계씩 안내
+    const coach = Object.keys(state.save.collection).length === 0 ? coachStep(guest) : null;
     let fab = { label: GUEST_TEXT.servingButton, disabled: true, loading: true };
     if (comforted) fab = { label: GUEST_TEXT.continueButton, onClick: actions.toCrossroads, sound: 'farewell' };
     else if (choosing) {
       const ready = isGuestReady(guest);
-      fab = { label: ready ? GUEST_TEXT.serveButton : missingPick(guest), onClick: actions.serve, disabled: !ready, sound: 'serve', feel: 'medium', serve: true };
+      fab = {
+        label: ready ? GUEST_TEXT.serveButton : missingPick(guest),
+        onClick: actions.serve,
+        disabled: !ready,
+        sound: 'serve',
+        feel: 'medium',
+        serve: true,
+        beckon: coach === 'serve',
+      };
     }
     return {
+      coach,
       tabs: comforted ? null : { onChange: actions.setPickMode, leafId: guest.leafId, fruitId: guest.fruitId, solved: guest.solved },
       header: comforted
         ? { text: fill(guest.firstTry ? FIRST_TRY_REWARD_TEXT : STAR_REWARD_TEXT, { name: guestData?.name ?? '' }), reward: guest.reward }
@@ -267,26 +287,60 @@ function PickTabs({ mode, onChange, leafId, fruitId, solved }) {
   );
 }
 
-function IngredientTile({ ingredient, number, mode, selected, tried, solved, recommended, selectable, onSelect }) {
+function IngredientTile({ ingredient, number, mode, selected, tried, solved, recommended, selectable, onSelect, onPeek }) {
   const disabled = !selectable || tried;
   const part = partOf(ingredient, mode);
   const notes = [tried && '아쉬웠던 재료', solved && '손님 마음에 꼭 맞은 재료', recommended && '팽주가 권하는 재료'].filter(Boolean);
+  // 꾹 누르면 재료 설명. 고를 수 없는 칸도 설명은 볼 수 있도록 disabled 대신 aria-disabled 를 쓴다
+  const press = useRef(null);
+  const endPress = () => {
+    if (!press.current) return;
+    clearTimeout(press.current.timer);
+    if (press.current.peeked) onPeek?.(null);
+  };
   return (
     <m.button
       type="button"
-      disabled={disabled}
+      aria-disabled={disabled || undefined}
       aria-pressed={selected}
       aria-label={[`${part.name} (${ingredient.virtue})`, ...notes].join(', ')}
       aria-keyshortcuts={String(number)}
+      title={`${part.name} · ${ingredient.virtue} — ${ingredient.image}`}
       whileTap={disabled ? undefined : { scale: 0.93 }}
+      onPointerDown={(event) => {
+        const tile = event.currentTarget;
+        const from = { x: event.clientX, y: event.clientY, peeked: false };
+        from.timer = setTimeout(() => {
+          from.peeked = true;
+          onPeek?.({ id: ingredient.id, mode, rect: tile.getBoundingClientRect() });
+          haptic('light');
+        }, LONG_PRESS_MS);
+        press.current = from;
+      }}
+      onPointerMove={(event) => {
+        const from = press.current;
+        if (!from || from.peeked || Math.hypot(event.clientX - from.x, event.clientY - from.y) < 10) return;
+        clearTimeout(from.timer); // 밀고 있으면 설명 대신 탭 넘기기
+        press.current = null;
+      }}
+      onPointerUp={endPress}
+      onPointerLeave={endPress}
+      onPointerCancel={() => {
+        endPress();
+        press.current = null;
+      }}
+      onContextMenu={(event) => event.preventDefault()}
       onClick={() => {
+        const peeked = press.current?.peeked;
+        press.current = null;
+        if (peeked || disabled) return; // 꾹 눌러 설명을 본 뒤에는 고르지 않는다
         onSelect?.(ingredient.id, mode);
         playSfx('select');
         haptic('light');
       }}
       className={`relative flex min-h-12 items-center gap-1.5 rounded-2xl border px-2 text-left transition-[background-color,border-color,box-shadow,opacity] duration-200 [@media(max-width:380px)]:gap-1 [@media(max-width:380px)]:px-1.5 ${
         selected ? 'bg-white/12' : 'border-white/8 bg-white/4'
-      } ${tried ? 'opacity-35' : !selectable && !selected && !recommended ? 'opacity-55' : ''}`}
+      } ${tried ? 'opacity-35' : !selectable && !selected && !recommended ? 'opacity-55' : ''} ${disabled ? 'cursor-default' : ''}`}
       style={selected || recommended ? { borderColor: part.color, boxShadow: `0 0 0 1px ${part.color}, 0 0 20px -6px ${part.color}` } : undefined}
     >
       <img
@@ -332,14 +386,16 @@ function IngredientTile({ ingredient, number, mode, selected, tried, solved, rec
   );
 }
 
-function FloatingAction({ label, onClick, disabled, loading, sound = 'tap', feel = 'light' }) {
+function FloatingAction({ label, onClick, disabled, loading, beckon, sound = 'tap', feel = 'light' }) {
   return (
     <TapButton
       sound={sound}
       feel={feel}
       disabled={disabled}
       onClick={onClick}
-      className="relative flex h-14 min-w-[62%] items-center justify-center gap-2 rounded-full bg-linear-to-b from-lamp-200 to-lamp-400 px-8 font-serif text-[17px] font-bold text-night-900 shadow-[0_14px_34px_-10px_rgba(245,184,96,0.75)] disabled:from-white/14 disabled:to-white/8 disabled:text-ink-300 disabled:shadow-none"
+      className={`relative flex h-14 min-w-[62%] items-center justify-center gap-2 rounded-full bg-linear-to-b from-lamp-200 to-lamp-400 px-8 font-serif text-[17px] font-bold text-night-900 shadow-[0_14px_34px_-10px_rgba(245,184,96,0.75)] disabled:from-white/14 disabled:to-white/8 disabled:text-ink-300 disabled:shadow-none ${
+        beckon && !disabled ? 'animate-beckon' : ''
+      }`}
     >
       {loading && (
         <span className="flex gap-1" aria-hidden="true">
@@ -355,6 +411,65 @@ function FloatingAction({ label, onClick, disabled, loading, sound = 'tap', feel
       )}
       {label}
     </TapButton>
+  );
+}
+
+/** 처음 오신 분 안내: 재료 칸 위(카운터 앞)에 떠서 지금 할 일을 알려 준다 */
+function CoachMark({ text, arrow }) {
+  return (
+    <div className="pointer-events-none absolute inset-x-0 top-0 z-40 flex -translate-y-full justify-center px-4 pb-1">
+      <m.div
+        className="flex flex-col items-center"
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: 4, transition: { duration: 0.15 } }}
+        transition={{ duration: 0.35, ease: 'easeOut' }}
+      >
+        <span aria-live="polite" className="break-keep rounded-full border border-lamp-300/45 bg-night-800/90 px-3.5 py-1 text-center text-[12.5px] text-lamp-100 shadow-[0_8px_24px_-10px_rgba(0,0,0,0.9)] backdrop-blur-md">
+          {text}
+        </span>
+        {arrow && (
+          <svg viewBox="0 0 24 24" className="mt-0.5 h-3.5 w-3.5 animate-nudge text-lamp-300" fill="currentColor" aria-hidden="true">
+            <path d="M4 8h16l-8 10z" />
+          </svg>
+        )}
+      </m.div>
+    </div>
+  );
+}
+
+/** 꾹 누른 재료의 설명: 누른 칸 바로 위에 뜬다 */
+function PeekCard({ peek, panel }) {
+  const ingredient = ingredientById(peek.id);
+  const part = partOf(ingredient, peek.mode);
+  const box = panel.current?.getBoundingClientRect();
+  if (!part || !box) return null;
+  const width = Math.min(264, box.width - 24);
+  const left = Math.min(Math.max(peek.rect.left + peek.rect.width / 2 - box.left - width / 2, 12), box.width - width - 12);
+  return (
+    <m.div
+      role="tooltip"
+      className="pointer-events-none absolute z-50 rounded-2xl border border-white/12 bg-night-800 p-3 text-left shadow-[0_18px_40px_-14px_rgba(0,0,0,0.95)]"
+      style={{ left, width, bottom: box.bottom - peek.rect.top + 8 }}
+      initial={{ opacity: 0, y: 6, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 4, transition: { duration: 0.12 } }}
+      transition={{ duration: 0.18, ease: 'easeOut' }}
+    >
+      <div className="flex items-center gap-2">
+        <img src={ingredientIconUrl(part.icon)} alt="" draggable={false} className="h-8 w-8 shrink-0" />
+        <div className="min-w-0">
+          <p className="font-serif text-[15px] leading-tight text-ink-100">
+            {part.name}
+            <span className="ml-1.5 text-[12px]" style={{ color: softText(part.color) }}>
+              {ingredient.virtue}
+            </span>
+          </p>
+          <p className="mt-0.5 text-[12px] leading-tight text-lamp-200">{ingredient.image}</p>
+        </div>
+      </div>
+      <p className="mt-2 break-keep text-[12.5px] leading-relaxed text-ink-300">{ingredient.description}</p>
+    </m.div>
   );
 }
 
@@ -428,6 +543,8 @@ export default function ActionPanel({ tapOverlay }) {
   const view = mode === PICK.FRUIT ? fruitView : leafView;
   const [flight, setFlight] = useState(null);
   const clearFlight = useRef(() => setFlight(null)).current;
+  const [peek, setPeek] = useState(null); // 꾹 누른 재료 { id, mode, rect }
+  const panel = useRef(null);
 
   const switchTab = (next) => {
     if (!model.tabs || next === mode) return;
@@ -453,7 +570,11 @@ export default function ActionPanel({ tapOverlay }) {
   useKeyboard(latest);
 
   return (
-    <div className="relative flex min-h-0 flex-1 flex-col px-4 pb-safe pt-3 [@media(max-height:700px)]:pt-2">
+    <div ref={panel} className="relative flex min-h-0 flex-1 flex-col px-4 pb-safe pt-3 [@media(max-height:700px)]:pt-2">
+      {/* 이 패널 안의 등장 연출은 바깥 AnimatePresence(initial=false)의 영향을 받지 않도록 각자 감싼다 */}
+      <AnimatePresence>
+        {model.coach && <CoachMark key={model.coach} text={COACH_TEXT[model.coach]} arrow={model.coach !== 'serve'} />}
+      </AnimatePresence>
       {model.tabs ? <PickTabs {...model.tabs} mode={mode} /> : <PanelHeader header={model.header} />}
 
       {/* 옆으로 밀면 [찻잎 | 과일] 탭이 넘어간다.
@@ -480,11 +601,13 @@ export default function ActionPanel({ tapOverlay }) {
                 tried={view.tried.includes(ingredient.id)}
                 selectable={view.selectable}
                 onSelect={model.onSelect}
+                onPeek={setPeek}
               />
             ))}
           </m.div>
         </AnimatePresence>
       </div>
+      <AnimatePresence>{peek && <PeekCard key={`${peek.mode}-${peek.id}`} peek={peek} panel={panel} />}</AnimatePresence>
 
       <div className="flex h-[72px] shrink-0 items-end justify-center [@media(max-height:700px)]:h-16">{fab && <FloatingAction {...fab} />}</div>
 
