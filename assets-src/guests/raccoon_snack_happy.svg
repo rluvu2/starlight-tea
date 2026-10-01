@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 야식을 못 끊는 너구리 (guest_005) · 마음이 따뜻해진 표정 -->
+  <defs>
+    <radialGradient id="raccoonHead" cx="0.42" cy="0.35" r="0.78">
+      <stop offset="0" stop-color="#C4BFBC"/>
+      <stop offset="1" stop-color="#97908D"/>
+    </radialGradient>
+    <linearGradient id="hoodie" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F0C35A"/>
+      <stop offset="1" stop-color="#D99F33"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 몸통: 후드티 -->
+  <path d="M 70 520 C 76 422 132 364 206 348 L 306 348 C 380 364 436 422 442 520 Z"
+        fill="url(#hoodie)" stroke="#8A6420" stroke-width="6" stroke-linejoin="round"/>
+  <!-- 모자(후드) -->
+  <path d="M 164 360 Q 168 332 214 338 Q 256 378 298 338 Q 344 332 348 360 Q 312 404 256 404 Q 200 404 164 360 Z"
+        fill="#E2AC40" stroke="#8A6420" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 끈 -->
+  <path d="M 236 388 L 230 438 M 276 388 L 282 438" stroke="#FFF6E2" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="230" cy="442" r="5" fill="#FFF6E2" stroke="#8A6420" stroke-width="2"/>
+  <circle cx="282" cy="442" r="5" fill="#FFF6E2" stroke="#8A6420" stroke-width="2"/>
+
+  <!-- 턱 그림자 -->
+  <ellipse cx="256" cy="340" rx="74" ry="13" fill="#000000" opacity="0.16"/>
+
+  <!-- 귀 -->
+  <path d="M 120 150 Q 112 76 172 74 Q 206 92 200 126 Z" fill="#6E6866" stroke="#3E3A3F" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 392 150 Q 400 76 340 74 Q 306 92 312 126 Z" fill="#6E6866" stroke="#3E3A3F" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 138 136 Q 134 96 168 92 Q 186 104 182 124 Z" fill="#E8DDD6"/>
+  <path d="M 374 136 Q 378 96 344 92 Q 326 104 330 124 Z" fill="#E8DDD6"/>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="226" rx="134" ry="114" fill="url(#raccoonHead)" stroke="#3E3A3F" stroke-width="6"/>
+  <!-- 이마 줄무늬 -->
+  <path d="M 256 114 Q 242 150 248 190 L 264 190 Q 270 150 256 114 Z" fill="#6E6866"/>
+  <!-- 눈 위 흰 털 (편안하게) -->
+  <path d="M 172 180 Q 198 166 228 178" fill="none" stroke="#F1EBE4" stroke-width="9" stroke-linecap="round"/>
+  <path d="M 340 180 Q 314 166 284 178" fill="none" stroke="#F1EBE4" stroke-width="9" stroke-linecap="round"/>
+  <!-- 눈가 무늬 (가면) -->
+  <path d="M 140 218 Q 168 184 214 196 Q 240 204 256 216 Q 272 204 298 196 Q 344 184 372 218 Q 356 258 310 254 Q 280 250 256 236 Q 232 250 202 254 Q 156 258 140 218 Z" fill="#3E3A3F"/>
+  <!-- 웃는 눈 -->
+  <path d="M 190 230 Q 206 208 222 230" fill="none" stroke="#FBF7F0" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 290 230 Q 306 208 322 230" fill="none" stroke="#FBF7F0" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- 주둥이 -->
+  <ellipse cx="256" cy="274" rx="58" ry="40" fill="#F1EBE4" stroke="#BDB3AC" stroke-width="3"/>
+  <!-- 코 -->
+  <path d="M 238 254 Q 256 244 274 254 Q 272 270 256 272 Q 240 270 238 254 Z" fill="#2B2628"/>
+  <ellipse cx="250" cy="255" rx="6" ry="2.5" fill="#FFFFFF" opacity="0.55"/>
+  <!-- 미소 -->
+  <path d="M 256 272 L 256 284" stroke="#3E3A3F" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 236 284 Q 246 300 256 286 Q 266 300 276 284" fill="none" stroke="#3E3A3F" stroke-width="4" stroke-linecap="round"/>
+  <!-- 볼터치 -->
+  <ellipse cx="170" cy="270" rx="18" ry="10" fill="#E8968A" opacity="0.7"/>
+  <ellipse cx="342" cy="270" rx="18" ry="10" fill="#E8968A" opacity="0.7"/>
+</svg>

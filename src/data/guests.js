@@ -50,6 +50,16 @@ export const GUESTS = [
     perfect_match_dialogue: "엄마가 타 주던 바로 그 맛이에요… 오늘 밤엔 양을 세지 않아도 잠들 수 있을 것 같아요."
   },
   {
+    id: "guest_004",
+    name: "생일을 잊힌 고양이",
+    appearance: "cat_birthday.png",
+    level: 1, // 쉬움: 사연에 "백차", "딸기"가 그대로 나와요 (찻잎과 과일이 서로 다른 열매)
+    story: "오늘 제 생일인데 아무도 기억하지 못했어요. 백차에 딸기를 띄워 주시면 웃을 수 있을 것 같아요.",
+    required_leaf: 2, // 2: 희락-백차
+    required_fruit: 1, // 1: 사랑-딸기
+    perfect_match_dialogue: "달콤한 향에 웃음이 나요! 찻집에서 받은 이 차가 올해 최고의 생일 선물이에요."
+  },
+  {
     id: "guest_003",
     name: "싹을 기다리는 다람쥐",
     appearance: "squirrel_waiting.png",
@@ -60,6 +70,16 @@ export const GUESTS = [
     perfect_match_dialogue: "오랜 시간 숙성된 만큼 깊은 맛이 나네요. 제 도토리도 땅속에서 천천히, 단단하게 자라고 있는 거겠죠? 조금 더 기다려 볼게요."
   },
   {
+    id: "guest_005",
+    name: "야식을 못 끊는 너구리",
+    appearance: "raccoon_snack.png",
+    level: 2, // 보통: "절제" → 찻잎, "오래 참는" → 과일 (먼저 나온 마음이 찻잎)
+    story: "밤마다 야식을 참으려 해도 절제가 안 돼요. 오래 참는 게 왜 이렇게 어려울까요?",
+    required_leaf: 9, // 9: 절제-말차
+    required_fruit: 4, // 4: 오래 참음-대추
+    perfect_match_dialogue: "쌉싸름하고 달큰해서 야식 생각이 사라졌어요. 오늘부터 천천히, 조금씩 참아 볼게요."
+  },
+  {
     id: "guest_001",
     name: "지친 직장인 곰",
     appearance: "bear_tired.png",
@@ -68,6 +88,16 @@ export const GUESTS = [
     required_leaf: 8, // 8: 온유-호지차
     required_fruit: 1, // 1: 사랑-딸기
     perfect_match_dialogue: "마치 누군가 저를 있는 그대로 안아 주는 기분이에요. 뾰족했던 마음이 둥글어지네요."
+  },
+  {
+    id: "guest_006",
+    name: "거절을 못 하는 토끼",
+    appearance: "rabbit_kind.png",
+    level: 3, // 어려움: 착하게 살수록 손해 보는 마음(양선) + 웃음을 잃은 마음(희락)
+    story: "부탁을 거절 못 해서 늘 남의 몫까지 떠맡아요. 착하게 살면 손해만 보는 것 같고… 요즘은 웃은 기억도 잘 안 나요.",
+    required_leaf: 6, // 6: 양선-녹차
+    required_fruit: 2, // 2: 희락-오렌지
+    perfect_match_dialogue: "오랜만에 웃음이 나요. 착한 마음은 그대로 두고, 내일은 '아니요'라고 말하는 연습도 해 볼게요."
   },
   // ... 이런 식으로 계속 추가됨
 ];

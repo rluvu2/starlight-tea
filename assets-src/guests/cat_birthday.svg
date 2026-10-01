@@ -1,0 +1,90 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 생일을 잊힌 고양이 (guest_004) -->
+  <defs>
+    <radialGradient id="catHead" cx="0.42" cy="0.36" r="0.78">
+      <stop offset="0" stop-color="#FBDDB4"/>
+      <stop offset="1" stop-color="#EDB27C"/>
+    </radialGradient>
+    <linearGradient id="sweater" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C3B3E2"/>
+      <stop offset="1" stop-color="#A592CF"/>
+    </linearGradient>
+    <clipPath id="hatClip">
+      <path d="M 218 120 L 292 112 L 270 26 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- 몸통: 폭신한 스웨터 -->
+  <path d="M 80 520 C 88 424 144 368 212 352 L 300 352 C 368 368 424 424 432 520 Z"
+        fill="url(#sweater)" stroke="#6E5E96" stroke-width="6" stroke-linejoin="round"/>
+  <g stroke="#8D7BBF" stroke-width="4" stroke-linecap="round" opacity="0.8">
+    <path d="M 150 430 Q 160 452 150 474"/><path d="M 178 410 Q 188 434 178 458"/>
+    <path d="M 362 430 Q 352 452 362 474"/><path d="M 334 410 Q 324 434 334 458"/>
+  </g>
+  <!-- 목도리 깃 -->
+  <path d="M 196 350 Q 256 384 316 350 L 322 372 Q 256 410 190 372 Z" fill="#E7DEF5" stroke="#6E5E96" stroke-width="5" stroke-linejoin="round"/>
+  <!-- 방울 목걸이 -->
+  <path d="M 200 346 Q 256 374 312 346" fill="none" stroke="#D65A6A" stroke-width="12" stroke-linecap="round"/>
+  <circle cx="256" cy="374" r="14" fill="#F5C04A" stroke="#B88A2A" stroke-width="4"/>
+  <path d="M 246 376 L 266 376" stroke="#B88A2A" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="251" cy="368" r="3.5" fill="#FFF3C4"/>
+
+  <!-- 턱 그림자 -->
+  <ellipse cx="256" cy="338" rx="70" ry="12" fill="#000000" opacity="0.15"/>
+
+  <!-- 귀 -->
+  <path d="M 150 156 L 136 58 L 226 116 Z" fill="#E9AA72" stroke="#8A5A3A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 362 156 L 376 58 L 286 116 Z" fill="#E9AA72" stroke="#8A5A3A" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M 160 140 L 152 86 L 204 120 Z" fill="#F4ABAE" stroke-linejoin="round"/>
+  <path d="M 352 140 L 360 86 L 308 120 Z" fill="#F4ABAE" stroke-linejoin="round"/>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="228" rx="130" ry="112" fill="url(#catHead)" stroke="#8A5A3A" stroke-width="6"/>
+  <!-- 이마 줄무늬 -->
+  <g fill="none" stroke="#D08A50" stroke-width="7" stroke-linecap="round">
+    <path d="M 232 132 Q 238 148 234 164"/>
+    <path d="M 256 128 L 256 158"/>
+    <path d="M 280 132 Q 274 148 278 164"/>
+  </g>
+  <!-- 볼 털 -->
+  <g fill="none" stroke="#D08A50" stroke-width="5" stroke-linecap="round" opacity="0.7">
+    <path d="M 134 214 L 152 220"/><path d="M 132 232 L 150 234"/>
+    <path d="M 378 214 L 360 220"/><path d="M 380 232 L 362 234"/>
+  </g>
+
+  <!-- 살짝 비뚤어진 고깔모자 -->
+  <path d="M 218 120 L 292 112 L 270 26 Z" fill="#F6A6B8"/>
+  <g clip-path="url(#hatClip)" fill="#FFF1C9">
+    <path d="M 200 92 L 300 70 L 300 84 L 200 106 Z"/>
+    <path d="M 200 56 L 300 34 L 300 48 L 200 70 Z"/>
+  </g>
+  <path d="M 218 120 L 292 112 L 270 26 Z" fill="none" stroke="#B05A78" stroke-width="5" stroke-linejoin="round"/>
+  <circle cx="270" cy="26" r="13" fill="#FFD08A" stroke="#C9963A" stroke-width="4"/>
+
+  <!-- 처진 눈썹 -->
+  <path d="M 182 196 Q 202 190 224 182" fill="none" stroke="#B87A4E" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 330 196 Q 310 190 288 182" fill="none" stroke="#B87A4E" stroke-width="5" stroke-linecap="round"/>
+  <!-- 촉촉한 눈 -->
+  <circle cx="206" cy="228" r="20" fill="#2B1C14"/>
+  <circle cx="306" cy="228" r="20" fill="#2B1C14"/>
+  <circle cx="213" cy="220" r="6.5" fill="#FFFFFF"/>
+  <circle cx="313" cy="220" r="6.5" fill="#FFFFFF"/>
+  <circle cx="200" cy="236" r="3" fill="#FFFFFF" opacity="0.85"/>
+  <circle cx="300" cy="236" r="3" fill="#FFFFFF" opacity="0.85"/>
+  <!-- 눈물 한 방울 -->
+  <path d="M 190 250 Q 184 262 188 268 A 7 7 0 0 0 200 266 Q 200 258 190 250 Z" fill="#A9DBF3" stroke="#5E9FC2" stroke-width="2.5"/>
+
+  <!-- 코 -->
+  <path d="M 244 256 Q 256 251 268 256 Q 263 268 256 270 Q 249 268 244 256 Z" fill="#E98A92" stroke="#B0585F" stroke-width="3" stroke-linejoin="round"/>
+  <!-- 시무룩한 입 -->
+  <path d="M 256 270 L 256 280" stroke="#6B3F2A" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 238 294 Q 247 282 256 280 Q 265 282 274 294" fill="none" stroke="#6B3F2A" stroke-width="4" stroke-linecap="round"/>
+  <!-- 수염 -->
+  <g stroke="#8A5A3A" stroke-width="3" stroke-linecap="round" opacity="0.7">
+    <path d="M 186 260 L 130 250"/><path d="M 186 270 L 128 272"/><path d="M 188 280 L 134 294"/>
+    <path d="M 326 260 L 382 250"/><path d="M 326 270 L 384 272"/><path d="M 324 280 L 378 294"/>
+  </g>
+  <!-- 볼터치 -->
+  <ellipse cx="174" cy="262" rx="17" ry="9" fill="#F29A9A" opacity="0.4"/>
+  <ellipse cx="338" cy="262" rx="17" ry="9" fill="#F29A9A" opacity="0.4"/>
+</svg>

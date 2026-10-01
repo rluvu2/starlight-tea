@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 거절을 못 하는 토끼 (guest_006) · 마음이 따뜻해진 표정 -->
+  <defs>
+    <radialGradient id="rabbitHead" cx="0.42" cy="0.36" r="0.78">
+      <stop offset="0" stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#EDE5DF"/>
+    </radialGradient>
+    <linearGradient id="cardigan" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#A9C99A"/>
+      <stop offset="1" stop-color="#86AC78"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 몸통: 카디건 -->
+  <path d="M 86 520 C 94 426 148 370 214 356 L 298 356 C 364 370 418 426 426 520 Z"
+        fill="url(#cardigan)" stroke="#4F6E46" stroke-width="6" stroke-linejoin="round"/>
+  <!-- 셔츠와 동그란 깃 -->
+  <path d="M 220 356 L 256 440 L 292 356 Z" fill="#FFFDF8" stroke="#C9C1B4" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 222 354 Q 214 384 244 384 Q 256 372 254 360 Z" fill="#FFFFFF" stroke="#C9C1B4" stroke-width="4" stroke-linejoin="round"/>
+  <path d="M 290 354 Q 298 384 268 384 Q 256 372 258 360 Z" fill="#FFFFFF" stroke="#C9C1B4" stroke-width="4" stroke-linejoin="round"/>
+  <!-- 카디건 단추 -->
+  <path d="M 218 360 L 246 470 M 294 360 L 266 470" stroke="#4F6E46" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="236" cy="420" r="6" fill="#F3EBD9" stroke="#8A7A5A" stroke-width="2.5"/>
+  <circle cx="276" cy="420" r="6" fill="#F3EBD9" stroke="#8A7A5A" stroke-width="2.5"/>
+  <!-- 메모지는 하나만, 하트를 그려 둔 -->
+  <g transform="rotate(8 344 392)">
+    <rect x="322" y="370" width="44" height="42" rx="3" fill="#FFE58F" stroke="#C9A93A" stroke-width="3"/>
+    <path d="M 344 402 C 330 392 332 380 340 381 C 343 381 344 384 344 386 C 344 384 345 381 348 381 C 356 380 358 392 344 402 Z" fill="#F08AA0"/>
+  </g>
+
+  <!-- 턱 그림자 -->
+  <ellipse cx="256" cy="344" rx="68" ry="12" fill="#000000" opacity="0.14"/>
+
+  <!-- 귀: 둘 다 쫑긋 -->
+  <ellipse cx="204" cy="86" rx="30" ry="66" transform="rotate(-10 204 86)" fill="#F7F2EE" stroke="#A9958A" stroke-width="6"/>
+  <ellipse cx="205" cy="94" rx="14" ry="46" transform="rotate(-10 205 94)" fill="#F4B6BE"/>
+  <ellipse cx="310" cy="86" rx="30" ry="66" transform="rotate(10 310 86)" fill="#F7F2EE" stroke="#A9958A" stroke-width="6"/>
+  <ellipse cx="309" cy="94" rx="14" ry="46" transform="rotate(10 309 94)" fill="#F4B6BE"/>
+  <!-- 반창고 -->
+  <g transform="rotate(-28 304 128)">
+    <rect x="286" y="121" width="36" height="14" rx="7" fill="#F7D9B5" stroke="#C9A27A" stroke-width="2.5"/>
+    <rect x="298" y="121" width="12" height="14" fill="#EFC79A"/>
+  </g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="238" rx="126" ry="108" fill="url(#rabbitHead)" stroke="#A9958A" stroke-width="6"/>
+
+  <!-- 편안해진 눈썹 -->
+  <path d="M 188 200 Q 204 190 224 196" fill="none" stroke="#B9A69B" stroke-width="5" stroke-linecap="round"/>
+  <path d="M 324 200 Q 308 190 288 196" fill="none" stroke="#B9A69B" stroke-width="5" stroke-linecap="round"/>
+  <!-- 웃는 눈 -->
+  <path d="M 192 244 Q 208 222 224 244" fill="none" stroke="#3A2420" stroke-width="7" stroke-linecap="round"/>
+  <path d="M 288 244 Q 304 222 320 244" fill="none" stroke="#3A2420" stroke-width="7" stroke-linecap="round"/>
+
+  <!-- 코 -->
+  <path d="M 247 264 Q 256 258 265 264 Q 261 273 256 274 Q 251 273 247 264 Z" fill="#E98A92" stroke="#B0585F" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- 활짝 웃는 입 -->
+  <path d="M 256 274 L 256 280" stroke="#7A5A50" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 236 282 Q 256 306 276 282 Z" fill="#E77F8E" stroke="#7A5A50" stroke-width="3.5" stroke-linejoin="round"/>
+  <path d="M 250 283 L 250 291 L 262 291 L 262 283 Z" fill="#FFFFFF"/>
+  <!-- 수염 -->
+  <g stroke="#B9A69B" stroke-width="2.5" stroke-linecap="round" opacity="0.8">
+    <path d="M 194 272 L 146 262"/><path d="M 194 282 L 148 286"/>
+    <path d="M 318 272 L 366 262"/><path d="M 318 282 L 364 286"/>
+  </g>
+  <!-- 볼터치 -->
+  <ellipse cx="180" cy="274" rx="19" ry="10" fill="#F4A2A8" opacity="0.75"/>
+  <ellipse cx="332" cy="274" rx="19" ry="10" fill="#F4A2A8" opacity="0.75"/>
+</svg>

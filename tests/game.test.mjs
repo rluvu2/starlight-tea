@@ -138,18 +138,29 @@ assert.deepEqual([flip.guest.leafId, flip.guest.fruitId], [8, null], '과일 탭
 assert.equal(reduce(flip, { type: 'SELECT', ingredientId: 1, mode: 'stem' }).guest.fruitId, 1, '모르는 탭이면 지금 탭으로');
 
 // 난이도와 방문 순서: 아직 마음을 데우지 못한 손님 중 가장 쉬운 단계부터
-assert.deepEqual(GUEST_LIST.map((g) => [g.id, g.level]), [['guest_002', 1], ['guest_003', 2], ['guest_001', 3]]);
+const levels = GUEST_LIST.map((g) => g.level);
+assert.deepEqual(levels, [...levels].sort(), '도감 번호도 쉬운 손님부터');
+assert.deepEqual([1, 2, 3].map((level) => levels.filter((l) => l === level).length >= 2), [true, true, true], '단계마다 손님이 둘 이상');
 for (const g of GUEST_LIST.filter((g) => g.level === 1)) {
   assert.ok(g.story.includes(ingredientById(g.required_leaf).name) && g.story.includes(ingredientById(g.required_fruit).fruit.name), `${g.name}: 쉬움은 정답 이름이 사연에 보인다`);
 }
+for (const g of GUEST_LIST.filter((g) => g.level === 2)) {
+  const words = [g.required_leaf, g.required_fruit].map((id) => ingredientById(id).virtue.slice(0, 2));
+  assert.ok(words.every((w) => g.story.includes(w)), `${g.name}: 보통은 열매 이름이 사연에 보인다 (${words})`);
+}
 const comforted = (...ids) => ({ collection: Object.fromEntries(ids.map((id) => [id, { count: 1 }])) });
-for (const roll of [0, 0.5, 0.99]) assert.equal(pickNextGuest(GUEST_LIST, {}, () => roll).id, 'guest_002', '처음엔 언제나 쉬운 손님');
-assert.equal(pickNextGuest(GUEST_LIST, comforted('guest_002')).id, 'guest_003', '쉬움 다음은 보통');
-assert.equal(pickNextGuest(GUEST_LIST, comforted('guest_002', 'guest_003')).id, 'guest_001', '그다음 어려움');
-assert.equal(pickNextGuest(GUEST_LIST, comforted('guest_001')).id, 'guest_002', '어려운 손님만 데웠던 옛 기록도 쉬운 손님부터');
-assert.equal(pickNextGuest(GUEST_LIST, { ...comforted('guest_003'), lastGuestId: 'guest_002' }).id, 'guest_002', '아직 못 데운 손님은 연달아 와도 된다');
-const all = { ...comforted('guest_001', 'guest_002', 'guest_003'), lastGuestId: 'guest_002' };
-for (const roll of [0, 0.5, 0.99]) assert.notEqual(pickNextGuest(GUEST_LIST, all, () => roll).id, 'guest_002', '모두 데운 뒤에는 직전 손님만 빼고');
+const idsAt = (level) => GUEST_LIST.filter((g) => g.level === level).map((g) => g.id);
+const levelOf = (progress, roll) => pickNextGuest(GUEST_LIST, progress, () => roll).level;
+for (const roll of [0, 0.5, 0.99]) assert.equal(levelOf({}, roll), 1, '처음엔 언제나 쉬운 손님');
+assert.notEqual(pickNextGuest(GUEST_LIST, {}, () => 0).id, pickNextGuest(GUEST_LIST, {}, () => 0.99).id, '같은 단계끼리는 무작위');
+assert.equal(levelOf(comforted(idsAt(1)[0]), 0.99), 1, '쉬운 손님을 다 데우기 전에는 쉬운 손님');
+for (const roll of [0, 0.99]) assert.equal(levelOf(comforted(...idsAt(1)), roll), 2, '쉬움 다음은 보통');
+for (const roll of [0, 0.99]) assert.equal(levelOf(comforted(...idsAt(1), ...idsAt(2)), roll), 3, '그다음 어려움');
+assert.equal(levelOf(comforted(...idsAt(3)), 0.5), 1, '어려운 손님만 데웠던 옛 기록도 쉬운 손님부터');
+const [firstEasy, secondEasy] = idsAt(1);
+assert.equal(pickNextGuest(GUEST_LIST, { ...comforted(secondEasy), lastGuestId: firstEasy }).id, firstEasy, '아직 못 데운 손님은 연달아 와도 된다');
+const all = { ...comforted(...GUEST_LIST.map((g) => g.id)), lastGuestId: firstEasy };
+for (const roll of [0, 0.5, 0.99]) assert.notEqual(pickNextGuest(GUEST_LIST, all, () => roll).id, firstEasy, '모두 데운 뒤에는 직전 손님만 빼고');
 const twins = [{ id: 'a', level: 1 }, { id: 'b', level: 1 }, { id: 'c', level: 2 }];
 assert.equal(pickNextGuest(twins, {}, () => 0).id, 'a'); assert.equal(pickNextGuest(twins, {}, () => 0.99).id, 'b', '같은 단계끼리는 무작위');
 assert.equal(pickNextGuest([], {}), null);
@@ -277,9 +288,14 @@ const view = buildCollection(
   }),
   [...GUEST_LIST, { id: 'guest_999', name: '새 손님' }],
 );
-assert.deepEqual(view.map((v) => v.status), ['visited', 'comforted', 'comforted', 'unknown']);
-assert.deepEqual(view[2].blend, { leafId: 8, fruitId: guestById('guest_001').required_fruit }, '예전 기록의 빠진 과일은 손님의 정답으로');
-assert.deepEqual(view[1].blend, { leafId: 4, fruitId: 4 }); assert.equal(view[0].blend, null);
+const entry = (id) => view.find((v) => v.guest.id === id);
+assert.deepEqual(
+  ['guest_002', 'guest_003', 'guest_001', 'guest_004', 'guest_999'].map((id) => entry(id).status),
+  ['visited', 'comforted', 'comforted', 'unknown', 'unknown'],
+);
+assert.equal(view.length, GUEST_LIST.length + 1, '지금 없는 손님의 기록은 도감에 나오지 않는다');
+assert.deepEqual(entry('guest_001').blend, { leafId: 8, fruitId: guestById('guest_001').required_fruit }, '예전 기록의 빠진 과일은 손님의 정답으로');
+assert.deepEqual(entry('guest_003').blend, { leafId: 4, fruitId: 4 }); assert.equal(entry('guest_002').blend, null);
 console.log('✓ 세이브 병합: 손상/옛 버전/모르는 필드/사라진 손님/새 손님/저장소 차단, 도감 기록 v2→v3(찻잎+과일)');
 
 // ── 3. 광고 서비스 ──
