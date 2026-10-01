@@ -105,7 +105,7 @@ export default function SettingsSheet({ onClose }) {
       </nav>
 
       <p className="mt-5 break-keep text-center text-xs leading-relaxed text-ink-400">
-        별빛 찻집 v2.0
+        별빛 찻집 v3.0
         <br />
         그림, 음악, 효과음은 모두 코드로 그리고 연주했어요.
       </p>

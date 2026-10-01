@@ -27,6 +27,7 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
+      - run: npm test # 상태 머신·블렌딩·조언·세이브·광고 단위 테스트. 하나라도 실패하면 배포하지 않습니다.
       - run: npm run build # 데이터 검사(npm run check) 후 빌드. 설정은 .env 를 따릅니다.
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5

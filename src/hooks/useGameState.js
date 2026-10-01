@@ -20,6 +20,7 @@ import { createContext, createElement, useContext, useEffect, useMemo, useReduce
 import { pauseForAd, resumeAfterAd } from '../audio/engine.js';
 import { STAR_REWARD } from '../data/rewards.js';
 import { HINT_TEMPLATE, REFLECTION_TEXT, SIP_LINES } from '../data/scripts.js';
+import { analyzeWorry, getClassifier } from '../logic/advisor.js';
 import { PICK } from '../logic/blend.js';
 import { FALLBACK_LINES, GUEST_LIST, guestById, ingredientById } from '../logic/gameData.js';
 import { fill } from '../logic/josa.js';
@@ -395,21 +396,24 @@ export function gameReducer(state, action) {
 
 const GameContext = createContext(null);
 
-// 팽주의 분석 모듈은 '나를 위한 차' 단계에서만 쓰므로 따로 불러온다
-let advisorModule = null;
-const loadAdvisor = () => {
-  advisorModule ??= import('../logic/advisor.js').then((mod) => {
-    mod.getClassifier(); // 미리 학습해 두어 [완성하기]를 눌렀을 때 기다림이 없게
-    return mod;
-  });
-  return advisorModule;
-};
 
 export function GameProvider({ children }) {
   const [state, dispatch] = useReducer(gameReducer, undefined, () => createInitialState(loadSave()));
   const stateRef = useRef(state);
   stateRef.current = state;
   const cancelAdRef = useRef(null);
+
+  // 팽주의 분류기는 앱을 연 뒤 한가할 때 미리 학습해 둔다 ([완성하기]를 눌렀을 때 기다림이 없게).
+  // 분석 모듈은 따로 나눠 받지 않고 본 파일에 함께 묶는다. 나눠 두면 새 버전을 배포했을 때
+  // 옛 화면을 열어 둔 유저가 사라진 파일을 받으려다 조언을 못 듣게 된다. (약 11KB)
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(() => getClassifier(), { timeout: 4000 });
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(() => getClassifier(), 1500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // 세이브가 바뀔 때마다 자동 저장
   useEffect(() => {
@@ -453,7 +457,6 @@ export function GameProvider({ children }) {
         dispatch({ type: 'TO_CROSSROADS' });
       },
       startReflection() {
-        loadAdvisor(); // 글을 쓰는 동안 미리 받아 둔다
         dispatch({ type: 'START_REFLECTION' });
       },
       setReflectionText(text) {
@@ -462,11 +465,10 @@ export function GameProvider({ children }) {
       setPickMode(mode) {
         dispatch({ type: 'SET_PICK_MODE', mode });
       },
-      async completeReflection() {
+      completeReflection() {
         const { phase, reflection } = stateRef.current;
         if (phase !== PHASE.REFLECTION || !isReflectionReady(reflection)) return;
         // NLP 분석은 지금 미리 실행해 결과를 보관한다 (광고가 끝난 뒤 기다리지 않도록)
-        const { analyzeWorry } = await loadAdvisor();
         const { leafId, fruitId } = reflection;
         dispatch({ type: 'COMPLETE_REFLECTION', advice: analyzeWorry(reflection.text, { leafId, fruitId }) });
       },

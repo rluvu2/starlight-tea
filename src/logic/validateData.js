@@ -4,6 +4,7 @@
 const DEFAULT_FALLBACK = '정성껏 끓여 주셔서 고마워요. 그런데 제 마음이 찾던 맛과는 조금 다른 것 같아요.';
 
 const isText = (value) => typeof value === 'string' && value.trim().length > 0;
+const isHexColor = (value) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(value).trim());
 
 const GUEST_TEXT_FIELDS = ['id', 'name', 'appearance', 'story', 'perfect_match_dialogue'];
 const INGREDIENT_TEXT_FIELDS = ['virtue', 'name', 'icon', 'color', 'image', 'description', 'hint'];
@@ -40,6 +41,9 @@ export function validateGameData({ guests, ingredients, fallbackDialogues }) {
     if (problems.length) {
       errors.push({ where, problems });
       return;
+    }
+    for (const [key, value] of [['color', ing.color], ['fruit.color', ing.fruit.color]]) {
+      if (!isHexColor(value)) warnings.push(`${where} (${ing.name}): "${key}" 는 #B4533A 같은 16진수 색이어야 찻잔·테두리 색이 보여요. 지금 값: ${value}`);
     }
     ingredientIds.add(ing.id);
     let comforts = (Array.isArray(ing.comforts) ? ing.comforts : []).filter(isText);

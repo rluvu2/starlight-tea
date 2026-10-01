@@ -1,14 +1,15 @@
 // 기획 데이터·배포 설정 검사: npm run check  (npm run build 전에 자동으로 실행됩니다)
-// guests.js 의 빠진 항목·중복 ID·잘못된 재료 번호·없는 그림 파일,
-// 팽주의 학습 문장 수, 광고·도메인 설정, 정책 페이지의 미입력 항목을 알려 준다.
+// guests.js 의 빠진 항목·중복 ID·잘못된 재료 번호·없는 그림 파일, 블렌딩 규칙,
+// 팽주의 학습 문장 수, 광고·도메인·썸네일 설정, 정책 페이지의 미입력 항목을 알려 준다.
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { BLEND_RULE, BLEND_TEXT } from '../src/data/blending.js';
 import { FALLBACK_DIALOGUES, GUESTS } from '../src/data/guests.js';
 import { INGREDIENTS } from '../src/data/ingredients.js';
 import { TRAIN_DATA } from '../src/data/trainData.js';
 import { happyFileName } from '../src/logic/fileNames.js';
-import { validateGameData, validateTrainData } from '../src/logic/validateData.js';
+import { validateBlendData, validateGameData, validateTrainData } from '../src/logic/validateData.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const { guests, ingredients, errors, warnings } = validateGameData({
@@ -19,6 +20,9 @@ const { guests, ingredients, errors, warnings } = validateGameData({
 const train = validateTrainData(TRAIN_DATA, ingredients);
 errors.push(...train.errors);
 warnings.push(...train.warnings);
+const blend = validateBlendData(BLEND_RULE, BLEND_TEXT);
+errors.push(...blend.errors);
+warnings.push(...blend.warnings);
 const trainCounts = train.counts;
 const trainSamples = train.samples;
 const notes = [];
@@ -62,6 +66,18 @@ notes.push(domain ? `도메인: ${domain} (빌드 결과에 CNAME 을 만들어�
 notes.push(`경로(base): ${base}`);
 if (domain && base !== '/') warnings.push(`커스텀 도메인(${domain})을 쓰면 BASE_PATH 는 / 여야 해요. 지금 값: ${base}`);
 
+const siteUrl = env.SITE_URL?.trim() ?? '';
+const withSlash = (url) => (url.endsWith('/') ? url : `${url}/`);
+if (!siteUrl) notes.push('썸네일: SITE_URL 이 비어 있어요. (GitHub Actions 에서는 아이디.github.io 주소로 자동으로 채워요)');
+else if (!/^https?:\/\/[^/]+\//.test(withSlash(siteUrl))) {
+  errors.push({ where: '.env › SITE_URL', problems: [`https://로 시작하는 전체 주소여야 해요. 지금 값: ${siteUrl}`] });
+} else {
+  notes.push(`썸네일: ${withSlash(siteUrl)}og-image.png`);
+  const path = withSlash(new URL(siteUrl).pathname);
+  if (path !== base) warnings.push(`SITE_URL 의 경로(${path})와 BASE_PATH(${base})가 달라요. 썸네일 주소가 틀릴 수 있어요.`);
+}
+if (!existsSync(join(root, 'public/og-image.png'))) warnings.push('public/og-image.png(1200×630 링크 미리보기 썸네일)가 없어요.');
+
 for (const page of ['about.html', 'privacy.html']) {
   const file = join(root, 'public', page);
   if (!existsSync(file)) errors.push({ where: `public/${page}`, problems: ['AdSense 심사에 필요한 페이지가 없어요'] });
@@ -72,6 +88,7 @@ for (const page of ['about.html', 'privacy.html']) {
 console.log('\n별빛 찻집 · 데이터 검사');
 console.log(`  손님 ${guests.length}명 · 재료 ${ingredients.length}가지 · 오답 대사 ${FALLBACK_DIALOGUES.length}개`);
 console.log(`  표정 변화 그림(_happy) ${happyCount}/${guests.length}명 (선택 사항)`);
+console.log(`  블렌딩: 1위 열매 = 찻잎, 2위 열매 = 과일 (2위가 1위의 ${Math.round(blend.ratio * 100)}% 이상일 때) · ${ingredients.length} × ${ingredients.length} = ${ingredients.length ** 2}가지`);
 console.log(`  팽주의 학습 문장 ${trainSamples.length}개 — ${ingredients.map((ing) => `${ing.virtue} ${trainCounts[ing.id] ?? 0}`).join(', ')}`);
 for (const note of notes) console.log(`  · ${note}`);
 console.log('');

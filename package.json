@@ -1,13 +1,14 @@
 {
   "name": "starlight-teahouse",
   "private": true,
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "별빛 찻집 - 모바일 우선 힐링 인터랙티브 스토리 게임",
   "type": "module",
   "scripts": {
     "dev": "vite --host",
     "build": "node scripts/check-data.mjs && vite build",
     "preview": "vite preview --host",
+    "test": "node --test tests/*.test.mjs",
     "check": "node scripts/check-data.mjs"
   },
   "dependencies": {

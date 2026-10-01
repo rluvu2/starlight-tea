@@ -42,6 +42,32 @@ function adsenseSnippet({ client, isBuild }) {
   };
 }
 
+/**
+ * 링크 미리보기(카카오톡·SNS 썸네일)는 절대 주소가 필요하다.
+ * SITE_URL → 없으면 CUSTOM_DOMAIN → 없으면 GitHub Actions 의 저장소 정보(아이디.github.io/저장소/) 순서로 정한다.
+ */
+function resolveSiteUrl(env, domain, base) {
+  const explicit = env.SITE_URL?.trim();
+  if (explicit) return explicit.endsWith('/') ? explicit : `${explicit}/`;
+  if (domain) return `https://${domain}${base}`;
+  const owner = process.env.GITHUB_REPOSITORY_OWNER;
+  return owner ? `https://${owner.toLowerCase()}.github.io${base}` : '';
+}
+
+/** index.html 의 %SITE_URL% 을 채운다. 주소를 정할 수 없으면 SITE_META 블록을 뺀다 */
+function siteMeta({ siteUrl }) {
+  return {
+    name: 'starlight-site-meta',
+    transformIndexHtml: {
+      order: 'pre',
+      handler(html) {
+        if (!siteUrl) return html.replace(/<!-- SITE_META:START[\s\S]*?SITE_META:END -->/, '');
+        return html.replace(/%SITE_URL%/g, siteUrl);
+      },
+    },
+  };
+}
+
 /** GitHub Pages 배포 마무리: 404.html, CNAME, ads.txt */
 function githubPages({ domain, client }) {
   let outDir;
@@ -72,7 +98,13 @@ export default defineConfig(({ command, mode, isPreview }) => {
   return {
     // 개발 서버는 / 에서, 빌드와 미리보기(npm run preview)는 BASE_PATH 에서 연다
     base: command === 'build' || isPreview ? normalizeBase(env.BASE_PATH) : '/',
-    plugins: [react(), tailwindcss(), adsenseSnippet({ client, isBuild: command === 'build' }), githubPages({ domain, client })],
+    plugins: [
+      react(),
+      tailwindcss(),
+      adsenseSnippet({ client, isBuild: command === 'build' }),
+      siteMeta({ siteUrl: resolveSiteUrl(env, domain, normalizeBase(env.BASE_PATH)) }),
+      githubPages({ domain, client }),
+    ],
     build: {
       assetsInlineLimit: 0,
     },

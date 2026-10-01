@@ -1,6 +1,6 @@
 // 팽주의 조언: 유저가 쓴 고민을 분류기로 읽어 블렌딩(1위 열매 = 찻잎, 2위 열매 = 과일)을 정하고,
 // 유저가 고른 찻잎·과일과 비교해 조언을 만든다.
-// 이 모듈(학습 문장 포함)은 '나를 위한 차' 단계에 들어갈 때 따로 불러온다 → 첫 화면은 가볍게.
+// 분류기는 처음 필요할 때(또는 앱을 연 뒤 한가할 때) 한 번만 학습한다.
 import { TRAIN_DATA } from '../data/trainData.js';
 import { ADVICE_TEXT } from '../data/scripts.js';
 import { NaiveBayes } from '../utils/naiveBayes.js';
@@ -36,7 +36,13 @@ export function getClassifier() {
  * }}
  */
 export function analyzeWorry(text, choice, random = Math.random) {
-  const { ranking, known } = getClassifier().classify(text);
+  let ranking = [];
+  let known = 0;
+  try {
+    ({ ranking, known } = getClassifier().classify(text));
+  } catch (error) {
+    if (import.meta.env?.DEV) console.error('[팽주의 조언] 분석 중 오류 — 고른 차를 그대로 존중해요.', error);
+  }
   const chosen = { leafId: choice?.leafId ?? null, fruitId: choice?.fruitId ?? null };
   const fallback = INGREDIENT_LIST[0]?.id ?? null;
   const safeChosen = blendParts(chosen) ? chosen : { leafId: fallback, fruitId: fallback };
