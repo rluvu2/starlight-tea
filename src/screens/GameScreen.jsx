@@ -8,6 +8,7 @@ import FairyLights from '../components/FairyLights.jsx';
 import TopBar from '../components/TopBar.jsx';
 import { ADVICE_TEXT, GUEST_TEXT } from '../data/scripts.js';
 import { PHASE, useGameState } from '../hooks/useGameState.js';
+import { skipTyping } from '../hooks/useTypewriter.js';
 import AdGatePhase from './phases/AdGatePhase.jsx';
 import AdvicePhase from './phases/AdvicePhase.jsx';
 import { GuestCup, GuestOverlay, GuestSprite } from './phases/GuestPhase.jsx';
@@ -30,10 +31,12 @@ export default function GameScreen({ onOpenCollection, onOpenSettings }) {
   }, [continuable, phase]);
 
   // 터치 영역은 가운데 장면과 하단 패널에 따로 깐다. (패널의 [찻잎 | 과일] 탭은 그 위에 남아 계속 누를 수 있다)
+  // 대사가 아직 나오는 중이면 첫 터치는 대사를 끝까지 보여 주기만 한다
   const tapOverlay = tapToContinue
     ? {
         label: phase === PHASE.ADVICE ? ADVICE_TEXT.backButton : GUEST_TEXT.continueButton,
         onContinue: () => {
+          if (skipTyping()) return;
           playSfx(phase === PHASE.ADVICE ? 'page' : 'farewell');
           actions.toCrossroads();
         },

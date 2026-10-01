@@ -27,7 +27,10 @@ export const OWNER_NAME = "팽주";
 export const PICK_TEXT = {
   leafTab: "찻잎",
   fruitTab: "과일",
-  emptyPick: "고르기"
+  emptyPick: "고르기",
+  // 아직 고르지 않은 쪽이 있을 때 아래 버튼에 보이는 문구
+  needLeaf: "찻잎을 골라 주세요",
+  needFruit: "과일을 골라 주세요"
 };
 
 // ── Phase 1: 손님 맞이 ──────────────────────────────────────────────
@@ -79,6 +82,8 @@ export const REFLECTION_TEXT = {
   placeholder: "예) 요즘 걱정이 많아서 밤에 잠이 잘 안 와요.",
   privacy: "적은 이야기는 이 기기 안에서만 읽고, 어디에도 저장하거나 보내지 않아요.",
   completeButton: "완성하기",
+  // 아직 아무것도 적지 않았을 때 아래 버튼에 보이는 문구
+  needText: "마음을 먼저 적어 주세요",
   back: "찻집으로",
   maxLength: 300
 };

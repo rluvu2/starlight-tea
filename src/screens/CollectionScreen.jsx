@@ -207,6 +207,9 @@ export default function CollectionScreen({ onClose }) {
 
   return (
     <m.div
+      role="dialog"
+      aria-modal="true"
+      aria-label="손님 도감"
       className="fixed inset-0 z-50 bg-night-950/90 backdrop-blur-md"
       initial={{ opacity: 0, y: 32 }}
       animate={{ opacity: 1, y: 0 }}

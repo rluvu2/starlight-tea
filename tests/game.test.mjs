@@ -130,6 +130,13 @@ assert.notEqual(twice.guest.line.text, serve(meet('guest_001'), 2, 5).guest.line
 assert.deepEqual(twice.guest.hint, { part: 'leaf', text: `가만히 보니, ${ingredientById(8).hint}` }, '둘 다 아쉬우면 찻잎 귀띔부터');
 assert.equal(serve(meet('guest_001'), 2, 5, { roll: undefined }).guest.line.text.length > 0, true, 'roll 이 없어도 대사를 고른다');
 
+// 탭이 넘어가는 사이에 누른 칸도 누른 탭 쪽에 들어간다 (SELECT 에 mode 를 함께 보낸다)
+let flip = reduce(meet('guest_001'), { type: 'SELECT', ingredientId: 2, mode: 'leaf' });
+assert.equal(flip.guest.pickMode, 'fruit');
+flip = reduce(flip, { type: 'SELECT', ingredientId: 8, mode: 'leaf' });
+assert.deepEqual([flip.guest.leafId, flip.guest.fruitId], [8, null], '과일 탭으로 넘어가기 전에 누른 찻잎은 찻잎으로');
+assert.equal(reduce(flip, { type: 'SELECT', ingredientId: 1, mode: 'stem' }).guest.fruitId, 1, '모르는 탭이면 지금 탭으로');
+
 // 난이도와 방문 순서: 아직 마음을 데우지 못한 손님 중 가장 쉬운 단계부터
 assert.deepEqual(GUEST_LIST.map((g) => [g.id, g.level]), [['guest_002', 1], ['guest_003', 2], ['guest_001', 3]]);
 for (const g of GUEST_LIST.filter((g) => g.level === 1)) {

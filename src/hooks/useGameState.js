@@ -245,11 +245,14 @@ export const isGuestReady = (guest) => canChooseTea(guest) && Boolean(ingredient
 export const isReflectionReady = (reflection) =>
   Boolean(reflection?.text.trim() && ingredientById(reflection.leafId) && ingredientById(reflection.fruitId));
 
-/** 지금 탭에 맞춰 찻잎 또는 과일을 고르고, 다른 쪽이 비어 있으면 그 탭으로 넘겨 준다 */
-function pickPart(selection, id) {
-  if (selection.pickMode === PICK.FRUIT) return { fruitId: id, pickMode: selection.leafId ? PICK.FRUIT : PICK.LEAF };
+/** 찻잎 또는 과일을 고르고, 다른 쪽이 비어 있으면 그 탭으로 넘겨 준다 */
+function pickPart(selection, id, mode) {
+  if (mode === PICK.FRUIT) return { fruitId: id, pickMode: selection.leafId ? PICK.FRUIT : PICK.LEAF };
   return { leafId: id, pickMode: selection.fruitId ? PICK.LEAF : PICK.FRUIT };
 }
+
+// SELECT 는 어느 탭에서 골랐는지(mode)를 함께 받는다. (탭이 넘어가는 사이에 누른 칸도 제자리에 들어가도록)
+const pickModeOf = (action, selection) => (PICK_MODES.includes(action.mode) ? action.mode : selection.pickMode);
 
 export function gameReducer(state, action) {
   switch (action.type) {
@@ -283,12 +286,12 @@ export function gameReducer(state, action) {
       const { guest, reflection } = state;
       if (state.phase === PHASE.GUEST && canChooseTea(guest)) {
         // 맞힌 쪽은 고정, 아쉬웠던 재료는 다시 고를 수 없다
-        const mode = guest.pickMode;
+        const mode = pickModeOf(action, guest);
         if (guest.solved[mode] || guest.tried[mode].includes(id)) return state;
-        return { ...state, guest: { ...guest, ...pickPart(guest, id) } };
+        return { ...state, guest: { ...guest, ...pickPart(guest, id, mode) } };
       }
       if (state.phase === PHASE.REFLECTION) {
-        return { ...state, reflection: { ...reflection, ...pickPart(reflection, id) } };
+        return { ...state, reflection: { ...reflection, ...pickPart(reflection, id, pickModeOf(action, reflection)) } };
       }
       return state;
     }
@@ -489,8 +492,8 @@ export function GameProvider({ children }) {
         nextGuest();
       },
       nextGuest,
-      select(ingredientId) {
-        dispatch({ type: 'SELECT', ingredientId });
+      select(ingredientId, mode) {
+        dispatch({ type: 'SELECT', ingredientId, mode });
       },
       serve() {
         const guest = guestById(stateRef.current.guest?.id);

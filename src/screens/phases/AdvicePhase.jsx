@@ -71,7 +71,7 @@ export default function AdvicePhase() {
   const { state } = useGameState();
   const { advice } = state;
   const reduceMotion = useReducedMotion();
-  const { shown, done } = useTypewriter(advice?.message ?? '', { instant: reduceMotion, speed: 34 });
+  const { shown, done } = useTypewriter(advice?.message ?? '', { instant: reduceMotion, speed: 34, skippable: true });
   const parts = blendParts(advice?.recommended);
 
   useEffect(() => {

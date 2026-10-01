@@ -9,7 +9,7 @@ import { SparkleIcon, StarIcon } from '../../components/icons.jsx';
 import { GlassCup, Steam } from '../../components/teaware.jsx';
 import { GUEST_TEXT, OWNER_NAME, PICK_TEXT } from '../../data/scripts.js';
 import { PHASE, useGameState } from '../../hooks/useGameState.js';
-import { useTypewriter } from '../../hooks/useTypewriter.js';
+import { skipTyping, useTypewriter } from '../../hooks/useTypewriter.js';
 import { blendColor, PICK } from '../../logic/blend.js';
 import { guestById } from '../../logic/gameData.js';
 import { fill } from '../../logic/josa.js';
@@ -113,23 +113,25 @@ export function GuestCup() {
   const { state } = useGameState();
   const { phase, guest, visitKey } = state;
   const visible = phase === PHASE.GUEST && guest?.served && guest.step !== 'talking';
+  // 차를 낼 때마다 새 찻잔 (아쉬운 반응 동안에는 마시던 잔이 그대로 남는다)
+  const serveNo = (guest?.misses ?? 0) + (guest?.step === 'serving' || guest?.step === 'comforted' ? 1 : 0);
   return (
     <AnimatePresence>
       {visible && (
         <m.div
-          key={`${visitKey}-${guest.misses}`}
+          key={`${visitKey}-${serveNo}`}
           className="absolute bottom-[calc(100%-10px)] left-1/2 w-[19%] max-w-[74px] -translate-x-1/2"
           initial={{ opacity: 0, y: 24, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 8 }}
-          transition={{ duration: 0.55, ease: 'easeOut' }}
+          exit={{ opacity: 0, y: 8, transition: { duration: 0.3 } }}
+          transition={{ duration: 0.5, ease: 'easeOut', delay: 0.35 }} // 찻잎과 과일이 날아와 앉은 뒤
         >
           <Steam className="absolute -top-[52%] left-1/2 w-[62%] -translate-x-1/2" />
           <GlassCup
             color={blendColor(guest.served)}
             level={0.45}
             initialLevel={1}
-            transition={{ delay: 0.8, duration: 1.4, ease: 'easeInOut' }}
+            transition={{ delay: 1, duration: 1.2, ease: 'easeInOut' }}
             className="w-full"
           />
         </m.div>
@@ -144,10 +146,16 @@ export function GuestCup() {
  */
 function SpeechBubble({ line, guestName, hint }) {
   const reduceMotion = useReducedMotion();
-  const { shown, done } = useTypewriter(line.text, { instant: reduceMotion, speed: 32 });
+  const { shown, done } = useTypewriter(line.text, { instant: reduceMotion, speed: 32, skippable: true });
   const nameTag = line.speaker === 'guest' ? guestName : line.speaker === 'owner' ? OWNER_NAME : null;
   return (
-    <div className="relative rounded-[22px] border border-white/10 bg-night-800/85 px-4 pb-3.5 pt-4 shadow-[0_16px_40px_-18px_rgba(0,0,0,0.9)] backdrop-blur-md">
+    // 타자 중에 누르면 대사를 끝까지 바로 보여 준다
+    <div
+      onClick={skipTyping}
+      className={`relative rounded-[22px] border border-white/10 bg-night-800/85 px-4 pb-3.5 pt-4 shadow-[0_16px_40px_-18px_rgba(0,0,0,0.9)] backdrop-blur-md ${
+        done ? '' : 'pointer-events-auto cursor-pointer'
+      }`}
+    >
       {nameTag && (
         <span className="absolute -top-3 left-4 max-w-[80%] truncate rounded-full bg-lamp-300 px-3 py-0.5 font-serif text-[12.5px] font-bold text-night-900 shadow-md">
           {nameTag}

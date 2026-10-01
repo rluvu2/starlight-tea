@@ -3,7 +3,7 @@ import { Candle, Teapot } from './teaware.jsx';
 // 찻집의 나무 카운터와 소품. children 은 카운터 위에 놓인다 (내어 드린 찻잔 등)
 export default function Counter({ children }) {
   return (
-    <div className="absolute inset-x-0 bottom-0 z-10" style={{ height: 'var(--counter-h)' }}>
+    <div data-counter className="absolute inset-x-0 bottom-0 z-10" style={{ height: 'var(--counter-h)' }}>
       <div className="absolute inset-x-0 top-0 h-3 rounded-t-md bg-linear-to-b from-[#b88866] to-[#8d5f45] shadow-[inset_0_1px_0_rgba(255,226,190,0.45)]" />
       <div
         className="absolute inset-x-0 bottom-0 top-3"

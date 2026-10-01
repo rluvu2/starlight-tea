@@ -1,7 +1,10 @@
-import { m } from 'framer-motion';
+import { AnimatePresence, m } from 'framer-motion';
+import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { playSfx } from '../audio/engine.js';
 import { AD_GATE_TEXT, ADVICE_TEXT, GUEST_TEXT, PICK_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
 import { isGuestReady, isReflectionReady, PHASE, useGameState } from '../hooks/useGameState.js';
+import { skipTyping } from '../hooks/useTypewriter.js';
 import { partOf, PICK } from '../logic/blend.js';
 import { guestById, INGREDIENT_LIST, ingredientById } from '../logic/gameData.js';
 import { fill } from '../logic/josa.js';
@@ -13,8 +16,17 @@ import { StarIcon } from './icons.jsx';
 
 const softText = (color) => `color-mix(in srgb, ${color} 62%, white)`;
 const idFor = (blend, mode) => (blend ? (mode === PICK.FRUIT ? blend.fruitId : blend.leafId) : null);
+const FLIP_DELAY_MS = 260; // 재료를 고른 뒤 다음 탭으로 넘어가기 전, 고른 칸을 보여 주는 시간
+const SWIPE_MIN_PX = 44; // 이만큼 옆으로 밀면 탭을 넘긴다
+const OTHER_MODE = { [PICK.LEAF]: PICK.FRUIT, [PICK.FRUIT]: PICK.LEAF };
 
-/** 지금 Phase 에서 재료 칸과 메인 버튼이 어떻게 보일지 정한다 */
+/** 아직 비어 있는 쪽을 알려 주는 버튼 문구 (둘 다 골랐으면 null) */
+const missingPick = (picked) => (!picked.leafId ? PICK_TEXT.needLeaf : !picked.fruitId ? PICK_TEXT.needFruit : null);
+
+/**
+ * 지금 Phase 에서 재료 칸과 메인 버튼이 어떻게 보일지 정한다.
+ * view(mode) 는 찻잎·과일 칸 각각의 모습 { selectable, selectedId, solvedId, recommendedId, tried }
+ */
 function usePanelModel() {
   const { state, actions } = useGameState();
   const { phase, guest, reflection, advice, adStatus } = state;
@@ -22,42 +34,44 @@ function usePanelModel() {
   // Phase 1: 손님에게도 찻잎 하나 + 과일 하나. 맞힌 쪽은 고정되고, 아쉬웠던 재료는 다시 고를 수 없다
   if (phase === PHASE.GUEST && guest) {
     const guestData = guestById(guest.id);
-    const mode = guest.pickMode;
     const choosing = guest.step === 'talking' || guest.step === 'missed';
     const comforted = guest.step === 'comforted';
+    let fab = { label: GUEST_TEXT.servingButton, disabled: true, loading: true };
+    if (comforted) fab = { label: GUEST_TEXT.continueButton, onClick: actions.toCrossroads, sound: 'farewell' };
+    else if (choosing) {
+      const ready = isGuestReady(guest);
+      fab = { label: ready ? GUEST_TEXT.serveButton : missingPick(guest), onClick: actions.serve, disabled: !ready, sound: 'serve', feel: 'medium', serve: true };
+    }
     return {
-      tabs: comforted ? null : { mode, onChange: actions.setPickMode, leafId: guest.leafId, fruitId: guest.fruitId, solved: guest.solved },
+      tabs: comforted ? null : { onChange: actions.setPickMode, leafId: guest.leafId, fruitId: guest.fruitId, solved: guest.solved },
       header: comforted ? { text: fill(STAR_REWARD_TEXT, { name: guestData?.name ?? '' }), reward: guest.reward } : null,
-      mode,
-      selectable: choosing && !guest.solved[mode],
-      selectedId: idFor(guest, mode),
-      solvedId: guest.solved[mode] ? idFor(guest, mode) : null,
-      tried: guest.tried[mode],
-      fab:
-        guest.step === 'serving'
-          ? { label: GUEST_TEXT.servingButton, disabled: true, loading: true }
-          : comforted
-            ? { label: GUEST_TEXT.continueButton, onClick: actions.toCrossroads, sound: 'farewell' }
-            : { label: GUEST_TEXT.serveButton, onClick: actions.serve, disabled: !isGuestReady(guest), sound: 'serve', feel: 'medium' },
+      mode: guest.pickMode,
+      view: (mode) => ({
+        selectable: choosing && !guest.solved[mode],
+        selectedId: idFor(guest, mode),
+        solvedId: guest.solved[mode] ? idFor(guest, mode) : null,
+        tried: guest.tried[mode],
+      }),
+      fab,
       onSelect: actions.select,
     };
   }
 
   // Phase 3 ~ 4: 찻잎 하나 + 과일 하나 (위의 [찻잎 | 과일] 탭으로 칸을 바꿔 본다)
   const mode = reflection.pickMode;
-  const tabs = (picked) => ({ mode, onChange: actions.setPickMode, leafId: picked.leafId, fruitId: picked.fruitId });
+  const tabs = (picked) => ({ onChange: actions.setPickMode, leafId: picked.leafId, fruitId: picked.fruitId });
+  const shows = (picked, extra) => (tab) => ({ selectable: false, selectedId: idFor(picked, tab), tried: [], ...extra?.(tab) });
 
   if (phase === PHASE.REFLECTION) {
+    const ready = isReflectionReady(reflection);
     return {
       tabs: tabs(reflection),
       mode,
-      selectable: true,
-      selectedId: idFor(reflection, mode),
-      tried: [],
+      view: shows(reflection, () => ({ selectable: true })),
       fab: {
-        label: REFLECTION_TEXT.completeButton,
+        label: ready ? REFLECTION_TEXT.completeButton : reflection.text.trim() ? missingPick(reflection) : REFLECTION_TEXT.needText,
         onClick: actions.completeReflection,
-        disabled: !isReflectionReady(reflection),
+        disabled: !ready,
         sound: 'plop',
         feel: 'medium',
       },
@@ -70,15 +84,14 @@ function usePanelModel() {
     return {
       tabs: tabs(advice.chosen),
       mode,
-      selectable: false,
-      selectedId: idFor(advice.chosen, mode),
-      tried: [],
+      view: shows(advice.chosen),
       fab: {
         label: loading ? AD_GATE_TEXT.loadingButton : isAdAvailable() ? AD_GATE_TEXT.watchButton : AD_GATE_TEXT.noAdButton,
         onClick: actions.watchAdForAdvice,
         disabled: loading,
         loading,
         sound: 'tap',
+        keyboard: false, // 광고는 버튼을 직접 눌렀을 때만
       },
     };
   }
@@ -87,15 +100,110 @@ function usePanelModel() {
     return {
       tabs: tabs(advice.chosen),
       mode,
-      selectable: false,
-      selectedId: idFor(advice.chosen, mode),
-      recommendedId: idFor(advice.recommended, mode),
-      tried: [],
+      view: shows(advice.chosen, (tab) => ({ recommendedId: idFor(advice.recommended, tab) })),
       fab: { label: ADVICE_TEXT.backButton, onClick: actions.toCrossroads, sound: 'page' },
     };
   }
 
-  return { header: { text: '' }, mode: PICK.LEAF, selectable: false, selectedId: null, tried: [], fab: null };
+  return { header: { text: '' }, mode: PICK.LEAF, view: () => ({ selectable: false, selectedId: null, tried: [] }), fab: null };
+}
+
+/** 재료를 골라 탭이 넘어갈 때는 고른 칸을 잠깐 보여 준 뒤 넘긴다. 탭을 직접 바꿀 때는 바로 */
+function useShownMode(mode, pickKey) {
+  const [shown, setShown] = useState(mode);
+  const lastPick = useRef(pickKey);
+  useEffect(() => {
+    const picked = lastPick.current !== pickKey;
+    lastPick.current = pickKey;
+    if (!picked) {
+      setShown(mode);
+      return undefined;
+    }
+    const timer = setTimeout(() => setShown(mode), FLIP_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [mode, pickKey]);
+  return shown;
+}
+
+/** 재료 칸을 옆으로 밀어 탭 넘기기. 밀고 난 뒤의 클릭은 재료 선택으로 치지 않는다 */
+function useSwipe(onSwipe) {
+  const start = useRef(null);
+  const swallowClick = useRef(false);
+  return {
+    onPointerDown(event) {
+      swallowClick.current = false;
+      start.current = { x: event.clientX, y: event.clientY, t: event.timeStamp };
+    },
+    onPointerUp(event) {
+      const from = start.current;
+      start.current = null;
+      if (!from) return;
+      const dx = event.clientX - from.x;
+      const dy = event.clientY - from.y;
+      if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.4 || event.timeStamp - from.t > 700) return;
+      swallowClick.current = true;
+      onSwipe(dx < 0 ? PICK.FRUIT : PICK.LEAF); // 왼쪽으로 밀면 오른쪽 탭(과일)
+    },
+    onPointerCancel() {
+      start.current = null;
+    },
+    onClickCapture(event) {
+      if (!swallowClick.current) return;
+      swallowClick.current = false;
+      event.stopPropagation();
+      event.preventDefault();
+    },
+  };
+}
+
+/** 차를 내어 드릴 때: 탭의 찻잎·과일 아이콘이 카운터 위 찻잔으로 날아간다 */
+function captureServeFlight(leafId, fruitId) {
+  const counter = document.querySelector('[data-counter]')?.getBoundingClientRect();
+  if (!counter) return null;
+  const items = [
+    [PICK.LEAF, leafId],
+    [PICK.FRUIT, fruitId],
+  ].flatMap(([mode, id]) => {
+    const icon = document.querySelector(`[data-pick-icon="${mode}"]`)?.getBoundingClientRect();
+    const part = partOf(ingredientById(id), mode);
+    return icon && part ? [{ mode, src: ingredientIconUrl(part.icon), x: icon.left + icon.width / 2, y: icon.top + icon.height / 2 }] : [];
+  });
+  return items.length ? { id: Date.now(), to: { x: counter.left + counter.width / 2, y: counter.top - 14 }, items } : null;
+}
+
+function ServeFlight({ flight, onDone }) {
+  useEffect(() => {
+    const timer = setTimeout(onDone, 1100);
+    return () => clearTimeout(timer);
+  }, [flight, onDone]);
+  return createPortal(
+    <div className="pointer-events-none fixed inset-0 z-[70]" aria-hidden="true">
+      {flight.items.map((item, i) => {
+        const dx = flight.to.x - item.x + (i === 0 ? -6 : 6);
+        const dy = flight.to.y - item.y;
+        return (
+          <m.img
+            key={item.mode}
+            src={item.src}
+            alt=""
+            draggable={false}
+            className="absolute -ml-4 -mt-4 h-8 w-8 drop-shadow-[0_0_8px_rgba(255,214,150,0.6)]"
+            style={{ left: item.x, top: item.y }}
+            initial={{ x: 0, y: 0, scale: 1, opacity: 1 }}
+            animate={{ x: [0, dx * 0.45, dx], y: [0, Math.min(dy, 0) - 56, dy], scale: [1, 1.2, 0.45], opacity: [1, 1, 0] }}
+            transition={{
+              duration: 0.7,
+              delay: i * 0.09,
+              ease: 'easeInOut',
+              times: [0, 0.45, 1],
+              opacity: { duration: 0.7, delay: i * 0.09, times: [0, 0.82, 1] }, // 찻잔에 닿을 때 사라진다
+            }}
+          />
+        );
+      })}
+    </div>,
+    document.body,
+  );
 }
 
 function CheckMark({ className }) {
@@ -139,7 +247,7 @@ function PickTabs({ mode, onChange, leafId, fruitId, solved }) {
             }}
             className="relative flex min-w-0 items-center justify-center gap-1.5 rounded-full px-2 text-[13px]"
           >
-            {part && <img src={ingredientIconUrl(part.icon)} alt="" draggable={false} className="h-5 w-5 shrink-0" />}
+            {part && <img src={ingredientIconUrl(part.icon)} alt="" draggable={false} data-pick-icon={key} className="h-5 w-5 shrink-0" />}
             <span className={active ? 'text-ink-100' : 'text-ink-400'}>{label}</span>
             <span className={`truncate font-serif ${part ? '' : 'text-ink-400'}`} style={part ? { color: softText(part.color) } : undefined}>
               {part ? part.name : PICK_TEXT.emptyPick}
@@ -157,7 +265,7 @@ function PickTabs({ mode, onChange, leafId, fruitId, solved }) {
   );
 }
 
-function IngredientTile({ ingredient, mode, selected, tried, solved, recommended, selectable, onSelect }) {
+function IngredientTile({ ingredient, number, mode, selected, tried, solved, recommended, selectable, onSelect }) {
   const disabled = !selectable || tried;
   const part = partOf(ingredient, mode);
   const notes = [tried && '아쉬웠던 재료', solved && '손님 마음에 꼭 맞은 재료', recommended && '팽주가 권하는 재료'].filter(Boolean);
@@ -167,9 +275,10 @@ function IngredientTile({ ingredient, mode, selected, tried, solved, recommended
       disabled={disabled}
       aria-pressed={selected}
       aria-label={[`${part.name} (${ingredient.virtue})`, ...notes].join(', ')}
+      aria-keyshortcuts={String(number)}
       whileTap={disabled ? undefined : { scale: 0.93 }}
       onClick={() => {
-        onSelect?.(ingredient.id);
+        onSelect?.(ingredient.id, mode);
         playSfx('select');
         haptic('light');
       }}
@@ -189,6 +298,13 @@ function IngredientTile({ ingredient, mode, selected, tried, solved, recommended
         <span className="block truncate text-[10.5px] leading-tight" style={{ color: softText(part.color) }}>
           {ingredient.virtue}
         </span>
+      </span>
+      {/* 마우스로 하는 화면에서만: 숫자 키 1~9 로도 고를 수 있어요 */}
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute bottom-1 right-2 hidden text-[10px] tabular-nums text-ink-400/60 [@media(hover:hover)_and_(pointer:fine)]:block"
+      >
+        {number}
       </span>
       {tried && (
         <span
@@ -262,40 +378,117 @@ function PanelHeader({ header }) {
   );
 }
 
+/**
+ * PC 키보드: 1~9 재료 고르기, ←/→ 탭 넘기기, Enter 대사 넘기기·메인 버튼.
+ * 글을 쓰는 중이거나 도감·설정 창이 열려 있으면 쉰다.
+ */
+function useKeyboard(latest) {
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || event.repeat) return;
+      const tag = event.target?.tagName;
+      if (['TEXTAREA', 'INPUT', 'SELECT'].includes(tag) || document.querySelector('[role="dialog"]')) return;
+      const { model, mode, switchTab, fab } = latest.current;
+      if (/^[1-9]$/.test(event.key)) {
+        const ingredient = INGREDIENT_LIST[Number(event.key) - 1];
+        const view = model.view(mode);
+        if (!ingredient || !model.onSelect || !view.selectable || view.tried.includes(ingredient.id)) return;
+        event.preventDefault();
+        model.onSelect(ingredient.id, mode);
+        playSfx('select');
+        haptic('light');
+      } else if ((event.key === 'ArrowLeft' || event.key === 'ArrowRight') && model.tabs) {
+        event.preventDefault();
+        switchTab(event.key === 'ArrowLeft' ? PICK.LEAF : PICK.FRUIT);
+      } else if (event.key === 'Enter' && tag !== 'BUTTON' && tag !== 'A') {
+        if (skipTyping()) {
+          event.preventDefault();
+          return;
+        }
+        if (!fab || fab.disabled || !fab.onClick || fab.keyboard === false) return;
+        event.preventDefault();
+        playSfx(fab.sound ?? 'tap');
+        haptic(fab.feel ?? 'light');
+        fab.onClick();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [latest]);
+}
+
 // 하단 액션 패널: 9가지 열매의 찻잎(또는 과일) 3×3 칸과 떠 있는 메인 버튼
 export default function ActionPanel({ tapOverlay }) {
   const model = usePanelModel();
+  const leafView = model.view(PICK.LEAF);
+  const fruitView = model.view(PICK.FRUIT);
+  const mode = useShownMode(model.mode, `${leafView.selectedId}-${fruitView.selectedId}`);
+  const view = mode === PICK.FRUIT ? fruitView : leafView;
+  const [flight, setFlight] = useState(null);
+  const clearFlight = useRef(() => setFlight(null)).current;
+
+  const switchTab = (next) => {
+    if (!model.tabs || next === mode) return;
+    model.tabs.onChange(next);
+    playSfx('tap');
+    haptic('light');
+  };
+  const swipe = useSwipe(switchTab);
+
+  // 차를 내어 드릴 때는 찻잎과 과일이 찻잔으로 날아간다
+  const fab = model.fab?.serve
+    ? {
+        ...model.fab,
+        onClick: () => {
+          setFlight(captureServeFlight(leafView.selectedId, fruitView.selectedId));
+          model.fab.onClick();
+        },
+      }
+    : model.fab;
+
+  const latest = useRef(null);
+  latest.current = { model, mode, switchTab, fab };
+  useKeyboard(latest);
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col px-4 pb-safe pt-3 [@media(max-height:700px)]:pt-2">
-      {model.tabs ? <PickTabs {...model.tabs} /> : <PanelHeader header={model.header} />}
+      {model.tabs ? <PickTabs {...model.tabs} mode={mode} /> : <PanelHeader header={model.header} />}
 
-      <m.div
-        key={model.mode}
-        className="grid min-h-0 flex-1 auto-rows-fr grid-cols-3 gap-2"
-        initial={{ opacity: 0.25 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.25 }}
-      >
-        {INGREDIENT_LIST.map((ingredient) => (
-          <IngredientTile
-            key={ingredient.id}
-            ingredient={ingredient}
-            mode={model.mode}
-            selected={model.selectedId === ingredient.id}
-            solved={model.solvedId === ingredient.id}
-            recommended={model.recommendedId === ingredient.id}
-            tried={model.tried.includes(ingredient.id)}
-            selectable={model.selectable}
-            onSelect={model.onSelect}
-          />
-        ))}
-      </m.div>
+      {/* 옆으로 밀면 [찻잎 | 과일] 탭이 넘어간다.
+          패널 바깥의 AnimatePresence(initial=false)와 상관없이 탭을 바꿀 때마다 미끄러지도록 따로 감싼다 */}
+      <div className="relative flex min-h-0 flex-1 touch-pan-y flex-col" {...(model.tabs ? swipe : {})}>
+        <AnimatePresence initial={false} mode="popLayout">
+          <m.div
+            key={mode}
+            className="grid min-h-0 flex-1 auto-rows-fr grid-cols-3 gap-2"
+            initial={{ opacity: 0.2, x: model.tabs ? (mode === PICK.FRUIT ? 26 : -26) : 0 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0.12 } }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {INGREDIENT_LIST.map((ingredient, index) => (
+              <IngredientTile
+                key={ingredient.id}
+                ingredient={ingredient}
+                number={index + 1}
+                mode={mode}
+                selected={view.selectedId === ingredient.id}
+                solved={view.solvedId === ingredient.id}
+                recommended={view.recommendedId === ingredient.id}
+                tried={view.tried.includes(ingredient.id)}
+                selectable={view.selectable}
+                onSelect={model.onSelect}
+              />
+            ))}
+          </m.div>
+        </AnimatePresence>
+      </div>
 
-      <div className="flex h-[72px] shrink-0 items-end justify-center [@media(max-height:700px)]:h-16">{model.fab && <FloatingAction {...model.fab} />}</div>
+      <div className="flex h-[72px] shrink-0 items-end justify-center [@media(max-height:700px)]:h-16">{fab && <FloatingAction {...fab} />}</div>
 
       {/* 탭(z-40) 아래, 재료 칸과 버튼 위 */}
       {tapOverlay && <TapToContinue {...tapOverlay} className="z-30" />}
+      <AnimatePresence>{flight && <ServeFlight key={flight.id} flight={flight} onDone={clearFlight} />}</AnimatePresence>
     </div>
   );
 }
