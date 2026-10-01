@@ -127,7 +127,13 @@ export const AD_GATE_TEXT = {
 export const ADVICE_TEXT = {
   // 찻잎과 과일이 둘 다 팽주의 블렌딩과 같을 때만 '일치'
   match: "지금 마음과 딱 맞는 차를 고르셨네요.",
-  // 그 외 (찻잎만 같거나, 과일만 같거나, 둘 다 다를 때)
+  // 한쪽만 같을 때는 어느 쪽이 맞았는지 짚어 준다
+  //   {leaf}·{fruit} 고른 찻잎·과일, {recommendedLeaf}·{recommendedFruit} 팽주가 권하는 찻잎·과일
+  leafMatch: "찻잎은 지금 마음과 꼭 맞아요. 과일은 {fruit} 대신 {recommendedFruit}{은/는} 어떨까요?",
+  fruitMatch: "과일은 지금 마음과 꼭 맞아요. 찻잎은 {leaf} 대신 {recommendedLeaf}{은/는} 어떨까요?",
+  // 고른 두 재료가 팽주의 블렌딩과 자리만 바뀌었을 때
+  swapped: "고르신 두 재료 모두 지금 마음에 닿아 있어요. 찻잎과 과일의 자리만 바꾼 {recommended}{은/는} 어떨까요?",
+  // 둘 다 다를 때
   suggest: "{chosen}도 좋지만 {recommended}{은/는} 어떨까요?",
   // 쓴 글에서 판단할 단서를 찾지 못했을 때 (고른 차를 그대로 존중)
   unknown: "말로 다 담기 어려운 마음이었나 봐요. 고르신 {chosen}{이/가} 지금 당신에게 필요한 차일 거예요.",

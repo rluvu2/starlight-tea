@@ -4,7 +4,7 @@
 import { TRAIN_DATA } from '../data/trainData.js';
 import { ADVICE_TEXT } from '../data/scripts.js';
 import { NaiveBayes } from '../utils/naiveBayes.js';
-import { blendLine, blendName, blendParts, decideBlend, isSameBlend } from './blend.js';
+import { blendLine, blendName, blendParts, decideBlend, isSameBlend, tasteBlend } from './blend.js';
 import { INGREDIENT_LIST, ingredientById } from './gameData.js';
 import { fill } from './josa.js';
 import { pick } from './random.js';
@@ -31,7 +31,9 @@ export function getClassifier() {
  * @returns {{
  *   chosen: { leafId, fruitId },       유저가 고른 차
  *   recommended: { leafId, fruitId },  팽주의 블렌딩 (단서가 없으면 유저가 고른 차)
- *   match, known, message, blendLine, comfort,
+ *   match,                              찻잎과 과일이 둘 다 같은지
+ *   result,                             어느 쪽이 같은지 (tasteBlend: match | leafOnly | fruitOnly | swapped | none)
+ *   known, message, blendLine, comfort,
  *   mood: { id, share }[]              마음의 결 상위 3개 (단서가 없으면 빈 배열)
  * }}
  */
@@ -50,14 +52,27 @@ export function analyzeWorry(text, choice, random = Math.random) {
   // 단서가 없으면 팽주가 판단하지 않고, 고른 차를 그대로 존중한다
   const recommended = (known > 0 && decideBlend(ranking)) || safeChosen;
   const match = isSameBlend(recommended, chosen); // 찻잎과 과일이 둘 다 같을 때만 일치
-  const names = { chosen: blendName(safeChosen), recommended: blendName(recommended) };
-  const message = known === 0 ? fill(ADVICE_TEXT.unknown, names) : match ? ADVICE_TEXT.match : fill(ADVICE_TEXT.suggest, names);
+  // 손님 맞이와 같은 기준으로, 찻잎·과일 중 어느 쪽이 팽주의 블렌딩과 같은지 (match | leafOnly | fruitOnly | swapped | none)
+  const result = tasteBlend(safeChosen, recommended);
+  const mine = blendParts(safeChosen);
+  const theirs = blendParts(recommended);
+  const names = {
+    chosen: blendName(safeChosen),
+    recommended: blendName(recommended),
+    leaf: mine?.leaf.name ?? '',
+    fruit: mine?.fruit.name ?? '',
+    recommendedLeaf: theirs?.leaf.name ?? '',
+    recommendedFruit: theirs?.fruit.name ?? '',
+  };
+  const template = { match: ADVICE_TEXT.match, leafOnly: ADVICE_TEXT.leafMatch, fruitOnly: ADVICE_TEXT.fruitMatch, swapped: ADVICE_TEXT.swapped }[result];
+  const message = known === 0 ? fill(ADVICE_TEXT.unknown, names) : fill(template ?? ADVICE_TEXT.suggest, names);
   const leaf = ingredientById(recommended.leafId);
 
   return {
     chosen,
     recommended,
     match,
+    result: known === 0 ? 'match' : result,
     known,
     message,
     blendLine: blendLine(recommended),

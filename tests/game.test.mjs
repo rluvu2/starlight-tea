@@ -218,13 +218,27 @@ const anger = analyzeWorry('화가 나서 소리를 질렀어요', { leafId: 8, 
 const rec = anger.recommended;
 assert.equal(rec.leafId, 8, '분노 → 온유(호지차)');
 const exact = analyzeWorry('화가 나서 소리를 질렀어요', rec);
-assert.equal(exact.match, true); assert.equal(exact.message, '지금 마음과 딱 맞는 차를 고르셨네요.');
+assert.equal(exact.match, true); assert.equal(exact.result, 'match'); assert.equal(exact.message, '지금 마음과 딱 맞는 차를 고르셨네요.');
 const otherFruit = rec.fruitId === 1 ? 2 : 1;
 const leafOnly = analyzeWorry('화가 나서 소리를 질렀어요', { leafId: rec.leafId, fruitId: otherFruit });
-assert.equal(leafOnly.match, false, '찻잎만 같으면 일치가 아니다');
-assert.equal(leafOnly.message, `${blendName({ leafId: rec.leafId, fruitId: otherFruit })}도 좋지만 ${blendName(rec)}는 어떨까요?`);
-const fruitOnly = analyzeWorry('화가 나서 소리를 질렀어요', { leafId: rec.leafId === 1 ? 2 : 1, fruitId: rec.fruitId });
-assert.equal(fruitOnly.match, false, '과일만 같아도 일치가 아니다');
+assert.equal(leafOnly.match, false, '찻잎만 같으면 일치가 아니다'); assert.equal(leafOnly.result, 'leafOnly');
+const recParts = blendParts(rec);
+assert.equal(
+  leafOnly.message,
+  fill('찻잎은 지금 마음과 꼭 맞아요. 과일은 {fruit} 대신 {to}{은/는} 어떨까요?', { fruit: ingredientById(otherFruit).fruit.name, to: recParts.fruit.name }),
+  '조언도 어느 쪽이 맞았는지 짚어 준다',
+);
+const otherLeaf = rec.leafId === 1 ? 2 : 1;
+const fruitOnly = analyzeWorry('화가 나서 소리를 질렀어요', { leafId: otherLeaf, fruitId: rec.fruitId });
+assert.equal(fruitOnly.match, false, '과일만 같아도 일치가 아니다'); assert.equal(fruitOnly.result, 'fruitOnly');
+assert.ok(fruitOnly.message.startsWith(`과일은 지금 마음과 꼭 맞아요. 찻잎은 ${ingredientById(otherLeaf).name} 대신 ${recParts.leaf.name}`));
+const neither = analyzeWorry('화가 나서 소리를 질렀어요', { leafId: otherLeaf, fruitId: otherFruit === rec.leafId ? 3 : otherFruit });
+assert.equal(neither.result === 'none' || neither.result === 'swapped', true);
+if (neither.result === 'none') assert.ok(neither.message.endsWith(`${blendName(rec)}는 어떨까요?`));
+if (rec.leafId !== rec.fruitId) {
+  const swapped = analyzeWorry('화가 나서 소리를 질렀어요', { leafId: rec.fruitId, fruitId: rec.leafId });
+  assert.equal(swapped.result, 'swapped'); assert.ok(swapped.message.includes('자리만 바꾼'));
+}
 const unknownAdvice = analyzeWorry('ㅁㄴㅇㄹ', { leafId: 4, fruitId: 9 });
 assert.equal(unknownAdvice.known, 0); assert.equal(unknownAdvice.match, true); assert.deepEqual(unknownAdvice.recommended, { leafId: 4, fruitId: 9 });
 assert.equal(unknownAdvice.message, '말로 다 담기 어려운 마음이었나 봐요. 고르신 보이차 레몬차가 지금 당신에게 필요한 차일 거예요.');

@@ -119,8 +119,10 @@ function usePanelModel() {
   }
 
   if (phase === PHASE.ADVICE && advice) {
+    // 팽주의 블렌딩과 같은 쪽 탭에 ✓
+    const { chosen, recommended } = advice;
     return {
-      tabs: tabs(advice.chosen),
+      tabs: { ...tabs(chosen), solved: { leaf: chosen.leafId === recommended.leafId, fruit: chosen.fruitId === recommended.fruitId } },
       mode,
       view: shows(advice.chosen, (tab) => ({ recommendedId: idFor(advice.recommended, tab) })),
       fab: { label: ADVICE_TEXT.backButton, onClick: actions.toCrossroads, sound: 'page' },
@@ -236,7 +238,7 @@ function CheckMark({ className }) {
   );
 }
 
-/** [찻잎 | 과일] 탭 — 고른 재료가 있으면 이름과 아이콘을, 손님 마음에 맞은 쪽에는 ✓ 를 보여 준다 */
+/** [찻잎 | 과일] 탭 — 고른 재료가 있으면 이름과 아이콘을, 손님 마음(또는 팽주의 블렌딩)에 맞은 쪽에는 ✓ 를 보여 준다 */
 function PickTabs({ mode, onChange, leafId, fruitId, solved }) {
   const items = [
     [PICK.LEAF, PICK_TEXT.leafTab, partOf(ingredientById(leafId), PICK.LEAF), solved?.leaf],
@@ -277,7 +279,7 @@ function PickTabs({ mode, onChange, leafId, fruitId, solved }) {
             {done && (
               <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-lamp-300 text-night-900">
                 <CheckMark className="h-2.5 w-2.5" />
-                <span className="sr-only">, 손님 마음에 꼭 맞았어요</span>
+                <span className="sr-only">, 꼭 맞았어요</span>
               </span>
             )}
           </button>
