@@ -1,18 +1,26 @@
 // 기획 데이터 검증: 게임(브라우저)과 `npm run check`(Node)가 함께 사용한다.
 // 잘못된 항목은 게임에서 제외하고, 무엇이 문제인지 한국어로 알려 준다.
 
-const DEFAULT_FALLBACK = '정성껏 끓여 주셔서 고마워요. 그런데 제 마음이 찾던 맛과는 조금 다른 것 같아요.';
+// 내어 드린 차가 꼭 맞지 않았을 때의 기본 대사 (guests.js 의 MISS_DIALOGUES 가 비어 있을 때)
+const DEFAULT_MISS_DIALOGUES = {
+  leafOnly: '{leaf} 향은 참 좋아요. 그런데 {fruit}{은/는} 지금 제 마음과 조금 다른 것 같아요.',
+  fruitOnly: '{fruit}{은/는} 반가운 맛이에요. 그런데 {leaf} 향이 조금 아쉬워요.',
+  swapped: '{leaf}{과/와} {fruit}… 둘 다 마음에 닿는데, 찻잎과 과일의 자리가 바뀐 것 같아요.',
+  none: '정성껏 끓여 주셔서 고마워요. 그런데 찻잎도 과일도 제 마음이 찾던 맛과는 조금 다른 것 같아요.',
+};
 
 const isText = (value) => typeof value === 'string' && value.trim().length > 0;
 const isHexColor = (value) => /^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(String(value).trim());
 
 const GUEST_TEXT_FIELDS = ['id', 'name', 'appearance', 'story', 'perfect_match_dialogue'];
+const GUEST_ANSWER_FIELDS = ['required_leaf', 'required_fruit'];
 const INGREDIENT_TEXT_FIELDS = ['virtue', 'name', 'icon', 'color', 'image', 'description', 'hint'];
 const FRUIT_TEXT_FIELDS = ['name', 'icon', 'color'];
 export const INGREDIENT_COUNT = 9; // 3×3 칸, 9 × 9 = 81가지 블렌딩
 export const RECOMMENDED_TRAIN_SENTENCES = 50; // 속성마다 권장하는 학습 문장 수
+export const DEFAULT_GUEST_LEVEL = 3; // level 이 비어 있는 손님은 가장 나중에 (어려움)
 
-export function validateGameData({ guests, ingredients, fallbackDialogues }) {
+export function validateGameData({ guests, ingredients, missDialogues }) {
   const errors = [];
   const warnings = [];
 
@@ -75,10 +83,18 @@ export function validateGameData({ guests, ingredients, fallbackDialogues }) {
     for (const key of GUEST_TEXT_FIELDS) {
       if (!isText(guest[key])) problems.push(`"${key}" 값이 비어 있거나, 따옴표로 감싼 글자가 아니에요`);
     }
-    const raw = guest.required_ingredient;
-    const ingredientId = typeof raw === 'string' && raw.trim() !== '' ? Number(raw) : raw;
-    if (!ingredientIds.has(ingredientId)) {
-      problems.push(`"required_ingredient" 는 재료 번호(${[...ingredientIds].join(', ')}) 중 하나여야 해요. 지금 값: ${JSON.stringify(raw)}`);
+    // 정답 찻잎·과일: 열매 번호 (따옴표로 감싼 숫자는 숫자로 읽고 알려 준다)
+    const answer = {};
+    const quoted = [];
+    for (const key of GUEST_ANSWER_FIELDS) {
+      const raw = guest[key];
+      const id = typeof raw === 'string' && raw.trim() !== '' ? Number(raw) : raw;
+      if (!ingredientIds.has(id)) {
+        problems.push(`"${key}" 는 열매 번호(${[...ingredientIds].join(', ')}) 중 하나여야 해요. 지금 값: ${JSON.stringify(raw)}`);
+      } else if (typeof raw === 'string') {
+        quoted.push(`${key} 를 숫자 ${id}(으)로 읽었어요`);
+      }
+      answer[key] = id;
     }
     if (isText(guest.id) && guestIds.has(guest.id)) {
       problems.push(`id "${guest.id}" 를 다른 손님이 이미 쓰고 있어요. id 는 중복될 수 없어요`);
@@ -87,23 +103,36 @@ export function validateGameData({ guests, ingredients, fallbackDialogues }) {
       errors.push({ where, problems });
       return;
     }
-    if (typeof raw === 'string') {
-      warnings.push(`${where}: required_ingredient 를 숫자 ${ingredientId}(으)로 읽었어요. 따옴표 없이 숫자로 적어 주세요.`);
+    if (quoted.length) warnings.push(`${where}: ${quoted.join(', ')}. 따옴표 없이 숫자로 적어 주세요.`);
+    let level = guest.level;
+    if (!Number.isInteger(level) || level < 1) {
+      warnings.push(`${where}: "level" 은 1(쉬움)·2(보통)·3(어려움) 같은 숫자여야 해요. 지금 값: ${JSON.stringify(level)} — ${DEFAULT_GUEST_LEVEL}(으)로 둘게요.`);
+      level = DEFAULT_GUEST_LEVEL;
+    }
+    // 쉬움 손님은 정답이 사연에 그대로 보여야 한다 (찻잎·과일 이름)
+    if (level === 1) {
+      const leaf = validIngredients.find((ing) => ing.id === answer.required_leaf);
+      const fruit = validIngredients.find((ing) => ing.id === answer.required_fruit);
+      const missing = [];
+      if (leaf && !guest.story.includes(leaf.name)) missing.push(`찻잎 "${leaf.name}"`);
+      if (fruit && !guest.story.includes(fruit.fruit.name)) missing.push(`과일 "${fruit.fruit.name}"`);
+      if (missing.length) warnings.push(`${where}: 쉬움(level 1) 손님은 사연에 ${missing.join(', ')} 이름이 그대로 나와야 정답이 한눈에 보여요.`);
     }
     guestIds.add(guest.id);
-    validGuests.push({ ...guest, required_ingredient: ingredientId });
+    validGuests.push({ ...guest, ...answer, level });
   });
 
-  // ── 오답 대사 ──────────────────────────────────────
-  let fallbacks = (Array.isArray(fallbackDialogues) ? fallbackDialogues : []).filter(isText);
-  if (fallbacks.length === 0) {
-    warnings.push('guests.js › FALLBACK_DIALOGUES 가 비어 있어서 기본 대사를 대신 사용해요.');
-    fallbacks = [DEFAULT_FALLBACK];
+  // ── 아쉬울 때의 대사 (찻잎만 맞음 / 과일만 맞음 / 자리가 바뀜 / 둘 다 아쉬움) ──
+  const dialogues = {};
+  for (const [key, fallback] of Object.entries(DEFAULT_MISS_DIALOGUES)) {
+    const lines = (Array.isArray(missDialogues?.[key]) ? missDialogues[key] : []).filter(isText);
+    if (lines.length === 0) warnings.push(`guests.js › MISS_DIALOGUES.${key} 가 비어 있어서 기본 대사를 대신 사용해요.`);
+    dialogues[key] = lines.length ? lines : [fallback];
   }
 
   if (validGuests.length === 0) warnings.push('게임에 등장할 수 있는 손님이 한 명도 없어요.');
 
-  return { guests: validGuests, ingredients: validIngredients, fallbackDialogues: fallbacks, errors, warnings };
+  return { guests: validGuests, ingredients: validIngredients, missDialogues: dialogues, errors, warnings };
 }
 
 /**

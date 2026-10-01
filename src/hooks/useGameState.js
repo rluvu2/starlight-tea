@@ -5,8 +5,9 @@
  *  URL 이동 없이 아래 Phase 사이를 오간다. (라우터 없음, App.jsx 가 phase 로 화면을 고른다)
  *
  *   TITLE ─(첫 방문)→ INTRO ─┐
- *     └──────────────────────┴→ GUEST (Phase 1 손님 맞이) ─정답 후 터치→ CROSSROADS (Phase 2 찻집 로비)
+ *     └──────────────────────┴→ GUEST (Phase 1 손님 맞이: 찻잎 1 + 과일 1) ─정답 후 터치→ CROSSROADS (Phase 2 찻집 로비)
  *   찻집 문을 열면 언제나 손님 맞이가 먼저다. 로비(메인 메뉴)는 첫 손님을 배웅한 뒤부터 열린다.
+ *   손님은 아직 마음을 데우지 못한 손님 중 가장 쉬운 단계(level)부터 찾아온다.
  *   CROSSROADS ─[다음 손님 맞이하기]→ GUEST (새 손님)
  *   CROSSROADS ─[나를 위한 차 끓이기]→ REFLECTION (Phase 3: 고민 + 찻잎 1 + 과일 1) ─[완성하기]→ AD_GATE (Phase 3.5)
  *   AD_GATE ─광고 끝까지 시청 / 광고 없음·차단·실패→ ADVICE (Phase 4) ─터치→ CROSSROADS
@@ -21,8 +22,8 @@ import { pauseForAd, resumeAfterAd } from '../audio/engine.js';
 import { STAR_REWARD } from '../data/rewards.js';
 import { HINT_TEMPLATE, REFLECTION_TEXT, SIP_LINES } from '../data/scripts.js';
 import { analyzeWorry, getClassifier } from '../logic/advisor.js';
-import { PICK } from '../logic/blend.js';
-import { FALLBACK_LINES, GUEST_LIST, guestById, ingredientById } from '../logic/gameData.js';
+import { blendParts, PICK, tasteBlend } from '../logic/blend.js';
+import { GUEST_LIST, guestBlend, guestById, ingredientById, MISS_LINES } from '../logic/gameData.js';
 import { fill } from '../logic/josa.js';
 import { pickNextGuest } from '../logic/pickGuest.js';
 import { pick, pickDifferent } from '../logic/random.js';
@@ -44,14 +45,14 @@ export const PHASE = {
 
 export const SAVE_KEY = 'starlight-teahouse/save';
 export const LEGACY_SAVE_KEY = 'starlight-teahouse-save'; // 이전 버전(v1)의 저장 위치
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3; // v3: 도감 기록에 찻잎(leafId)과 과일(fruitId)을 함께 남긴다
 const DEFAULT_SETTINGS = { music: true, sfx: true, haptics: true };
 
 export function createDefaultSave() {
   return {
     version: SAVE_VERSION,
     stars: 0, // 보유 별조각
-    collection: {}, // 해금 도감 { [guestId]: { firstAt, count, ingredientId } }
+    collection: {}, // 해금 도감 { [guestId]: { firstAt, count, leafId, fruitId } } — 마음을 데운 찻잎·과일
     visits: {}, // { [guestId]: 방문 횟수 }
     lastGuestId: null,
     seenIntro: false,
@@ -62,6 +63,7 @@ export function createDefaultSave() {
 
 const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const toCount = (value) => (Number.isFinite(value) && value > 0 ? Math.floor(value) : 0);
+const toId = (value) => (Number.isInteger(value) ? value : null);
 
 function sanitizeCollection(raw) {
   const collection = {};
@@ -71,7 +73,9 @@ function sanitizeCollection(raw) {
     collection[guestId] = {
       firstAt: Number.isFinite(entry.firstAt) ? entry.firstAt : 0,
       count: Math.max(1, toCount(entry.count)),
-      ingredientId: Number.isInteger(entry.ingredientId) ? entry.ingredientId : null,
+      // v2 까지는 찻잎 하나만 ingredientId 로 남겼다
+      leafId: toId(entry.leafId) ?? toId(entry.ingredientId),
+      fruitId: toId(entry.fruitId),
     };
   }
   return collection;
@@ -180,10 +184,14 @@ export function buildCollection(save, guests = GUEST_LIST) {
   return guests.map((guest, index) => {
     const record = save.collection[guest.id] ?? null;
     const visits = save.visits[guest.id] ?? 0;
+    // 마음을 데운 차 { leafId, fruitId } — 예전 기록에 빠진 쪽은 손님의 정답으로 채운다
+    const answer = guestBlend(guest);
+    const blend = record ? { leafId: record.leafId ?? answer.leafId, fruitId: record.fruitId ?? answer.fruitId } : null;
     return {
       guest,
       number: index + 1,
       record,
+      blend,
       visits,
       status: record ? 'comforted' : visits > 0 ? 'visited' : 'unknown',
     };
@@ -194,28 +202,54 @@ export function buildCollection(save, guests = GUEST_LIST) {
  *  2. 상태 머신 — 순수 함수 (무작위 값과 시간은 action 으로 받는다)
  * ═══════════════════════════════════════════════════════════════════ */
 
-// Phase 3: 고민 글 + 유저가 고른 찻잎(leafId)·과일(fruitId) + 아래 칸이 지금 보여 주는 탭(pickMode)
-const emptyReflection = () => ({ text: '', leafId: null, fruitId: null, pickMode: PICK.LEAF });
+// Phase 1·3 공통: 유저가 고른 찻잎(leafId)·과일(fruitId) + 아래 칸이 지금 보여 주는 탭(pickMode)
+const emptyPick = () => ({ leafId: null, fruitId: null, pickMode: PICK.LEAF });
+// Phase 3: 고민 글 + 찻잎·과일
+const emptyReflection = () => ({ text: '', ...emptyPick() });
 const PICK_MODES = [PICK.LEAF, PICK.FRUIT];
 const REFLECTION_FLOW = [PHASE.REFLECTION, PHASE.AD_GATE, PHASE.ADVICE];
+const HINT_AFTER_MISSES = 2; // 두 번째로 아쉬운 차를 드렸을 때부터 귀띔
+
+// Phase 1: 손님 한 분의 방문
+const newVisit = (guest) => ({
+  id: guest.id,
+  step: 'talking', // talking | serving | missed | comforted
+  line: { speaker: 'guest', text: guest.story },
+  ...emptyPick(),
+  served: null, // 마지막으로 내어 드린 { leafId, fruitId }
+  result: null, // 마지막 한 모금의 결과 (tasteBlend: match | leafOnly | fruitOnly | swapped | none)
+  solved: { leaf: false, fruit: false }, // 맞힌 쪽은 고정된다
+  tried: { leaf: [], fruit: [] }, // 아쉬웠던 찻잎·과일 (다시 고를 수 없다)
+  misses: 0,
+  hint: null, // { part: leaf|fruit, text }
+  reward: 0,
+  isNewEntry: false,
+});
 
 export function createInitialState(save = createDefaultSave()) {
   return {
     phase: PHASE.TITLE,
     save,
     visitKey: 0,
-    guest: null, // Phase 1: { id, step: talking|serving|missed|comforted, line, tried, selectedId, servedId, hint, reward, isNewEntry }
+    guest: null, // Phase 1 (newVisit)
     reflection: emptyReflection(), // Phase 3
     advice: null, // Phase 3 에서 미리 계산해 둔 조언 (analyzeWorry 결과)
     adStatus: 'idle', // Phase 3.5: idle | loading | dismissed
-    lastFallback: null,
+    lastMissLine: null, // 같은 대사가 연달아 나오지 않도록
     tonight: { guests: 0, teas: 0 }, // 로비에 보여 줄 오늘 밤의 기록 (저장하지 않음)
   };
 }
 
 const canChooseTea = (guest) => guest?.step === 'talking' || guest?.step === 'missed';
+export const isGuestReady = (guest) => canChooseTea(guest) && Boolean(ingredientById(guest.leafId) && ingredientById(guest.fruitId));
 export const isReflectionReady = (reflection) =>
   Boolean(reflection?.text.trim() && ingredientById(reflection.leafId) && ingredientById(reflection.fruitId));
+
+/** 지금 탭에 맞춰 찻잎 또는 과일을 고르고, 다른 쪽이 비어 있으면 그 탭으로 넘겨 준다 */
+function pickPart(selection, id) {
+  if (selection.pickMode === PICK.FRUIT) return { fruitId: id, pickMode: selection.leafId ? PICK.FRUIT : PICK.LEAF };
+  return { leafId: id, pickMode: selection.fruitId ? PICK.LEAF : PICK.FRUIT };
+}
 
 export function gameReducer(state, action) {
   switch (action.type) {
@@ -234,17 +268,7 @@ export function gameReducer(state, action) {
         ...state,
         phase: PHASE.GUEST,
         visitKey: state.visitKey + 1,
-        guest: {
-          id: guest.id,
-          step: 'talking',
-          line: { speaker: 'guest', text: guest.story },
-          tried: [],
-          selectedId: null,
-          servedId: null,
-          hint: null,
-          reward: 0,
-          isNewEntry: false,
-        },
+        guest: newVisit(guest),
         save: {
           ...save,
           visits: { ...save.visits, [guest.id]: (save.visits[guest.id] ?? 0) + 1 },
@@ -254,27 +278,32 @@ export function gameReducer(state, action) {
     }
 
     case 'SELECT': {
-      if (!ingredientById(action.ingredientId)) return state;
-      if (state.phase === PHASE.GUEST && canChooseTea(state.guest) && !state.guest.tried.includes(action.ingredientId)) {
-        return { ...state, guest: { ...state.guest, selectedId: action.ingredientId } };
+      const id = action.ingredientId;
+      if (!ingredientById(id)) return state;
+      const { guest, reflection } = state;
+      if (state.phase === PHASE.GUEST && canChooseTea(guest)) {
+        // 맞힌 쪽은 고정, 아쉬웠던 재료는 다시 고를 수 없다
+        const mode = guest.pickMode;
+        if (guest.solved[mode] || guest.tried[mode].includes(id)) return state;
+        return { ...state, guest: { ...guest, ...pickPart(guest, id) } };
       }
       if (state.phase === PHASE.REFLECTION) {
-        // 지금 탭에 맞춰 찻잎 또는 과일을 고르고, 다른 쪽이 비어 있으면 그 탭으로 넘겨 준다
-        const { reflection } = state;
-        if (reflection.pickMode === PICK.FRUIT) {
-          return { ...state, reflection: { ...reflection, fruitId: action.ingredientId, pickMode: reflection.leafId ? PICK.FRUIT : PICK.LEAF } };
-        }
-        return { ...state, reflection: { ...reflection, leafId: action.ingredientId, pickMode: reflection.fruitId ? PICK.LEAF : PICK.FRUIT } };
+        return { ...state, reflection: { ...reflection, ...pickPart(reflection, id) } };
       }
       return state;
     }
 
     case 'SERVE': {
       const { guest } = state;
-      if (state.phase !== PHASE.GUEST || !canChooseTea(guest) || !guest.selectedId) return state;
+      if (state.phase !== PHASE.GUEST || !isGuestReady(guest)) return state;
       return {
         ...state,
-        guest: { ...guest, step: 'serving', servedId: guest.selectedId, line: { speaker: 'narration', text: action.sipLine } },
+        guest: {
+          ...guest,
+          step: 'serving',
+          served: { leafId: guest.leafId, fruitId: guest.fruitId },
+          line: { speaker: 'narration', text: action.sipLine },
+        },
       };
     }
 
@@ -282,9 +311,12 @@ export function gameReducer(state, action) {
       const { guest, save } = state;
       const data = guestById(guest?.id);
       if (state.phase !== PHASE.GUEST || guest?.step !== 'serving' || !data) return state;
+      const { served } = guest;
+      const answer = guestBlend(data);
+      const result = tasteBlend(served, answer);
 
-      if (guest.servedId === data.required_ingredient) {
-        // 정답: 고유 위로 대사 + 별조각 획득 + 도감 해금
+      if (result === 'match') {
+        // 찻잎과 과일이 둘 다 맞으면: 고유 위로 대사 + 별조각 획득 + 도감 해금
         const previous = save.collection[guest.id];
         const isNewEntry = !previous;
         const reward = STAR_REWARD.perfectMatch + (isNewEntry ? STAR_REWARD.firstComfort : 0);
@@ -293,7 +325,8 @@ export function gameReducer(state, action) {
           guest: {
             ...guest,
             step: 'comforted',
-            selectedId: null,
+            result,
+            solved: { leaf: true, fruit: true },
             hint: null,
             reward,
             isNewEntry,
@@ -305,29 +338,40 @@ export function gameReducer(state, action) {
             stars: save.stars + reward,
             collection: {
               ...save.collection,
-              [guest.id]: {
-                firstAt: previous?.firstAt ?? action.now,
-                count: (previous?.count ?? 0) + 1,
-                ingredientId: guest.servedId,
-              },
+              [guest.id]: { firstAt: previous?.firstAt ?? action.now, count: (previous?.count ?? 0) + 1, ...served },
             },
           },
         };
       }
 
-      // 오답: 범용 대사 후 다시 고르기. 두 번째 오답부터 귀띔
-      const tried = [...guest.tried, guest.servedId];
-      const answer = ingredientById(data.required_ingredient);
+      // 아쉬운 차: 손님이 어느 쪽이 맞았는지 알려 준다. 맞힌 쪽은 그대로 두고(고정) 아쉬운 쪽만 다시 고른다.
+      // 두 번째로 아쉬운 차부터는 아직 못 맞힌 쪽(찻잎 먼저)의 귀띔
+      const leafOk = result === 'leafOnly';
+      const fruitOk = result === 'fruitOnly';
+      const roll = Number.isFinite(action.roll) ? action.roll : 0;
+      const template = pickDifferent(MISS_LINES[result], state.lastMissLine, () => roll);
+      const parts = blendParts(served);
+      const misses = guest.misses + 1;
+      const hintPart = leafOk ? PICK.FRUIT : PICK.LEAF;
+      const hintFrom = ingredientById(hintPart === PICK.LEAF ? answer.leafId : answer.fruitId);
       return {
         ...state,
-        lastFallback: action.fallbackLine,
+        lastMissLine: template,
         guest: {
           ...guest,
           step: 'missed',
-          tried,
-          selectedId: null,
-          line: { speaker: 'guest', text: action.fallbackLine },
-          hint: tried.length >= 2 && answer ? fill(HINT_TEMPLATE, { hint: answer.hint }) : null,
+          result,
+          leafId: leafOk ? served.leafId : null,
+          fruitId: fruitOk ? served.fruitId : null,
+          pickMode: hintPart,
+          solved: { leaf: leafOk, fruit: fruitOk },
+          tried: {
+            leaf: leafOk ? guest.tried.leaf : [...guest.tried.leaf, served.leafId],
+            fruit: fruitOk ? guest.tried.fruit : [...guest.tried.fruit, served.fruitId],
+          },
+          misses,
+          line: { speaker: 'guest', text: fill(template, { leaf: parts?.leaf.name ?? '', fruit: parts?.fruit.name ?? '' }) },
+          hint: misses >= HINT_AFTER_MISSES && hintFrom ? { part: hintPart, text: fill(HINT_TEMPLATE, { hint: hintFrom.hint }) } : null,
         },
       };
     }
@@ -344,7 +388,9 @@ export function gameReducer(state, action) {
       return { ...state, phase: PHASE.REFLECTION, reflection: emptyReflection(), advice: null, adStatus: 'idle' };
 
     case 'SET_PICK_MODE':
-      if (!REFLECTION_FLOW.includes(state.phase) || !PICK_MODES.includes(action.mode)) return state;
+      if (!PICK_MODES.includes(action.mode)) return state;
+      if (state.phase === PHASE.GUEST && state.guest) return { ...state, guest: { ...state.guest, pickMode: action.mode } };
+      if (!REFLECTION_FLOW.includes(state.phase)) return state;
       return { ...state, reflection: { ...state.reflection, pickMode: action.mode } };
 
     case 'SET_TEXT':
@@ -451,7 +497,7 @@ export function GameProvider({ children }) {
         if (guest) dispatch({ type: 'SERVE', sipLine: fill(pick(SIP_LINES), { name: guest.name }) });
       },
       resolveServe() {
-        dispatch({ type: 'RESOLVE_SERVE', fallbackLine: pickDifferent(FALLBACK_LINES, stateRef.current.lastFallback), now: Date.now() });
+        dispatch({ type: 'RESOLVE_SERVE', roll: Math.random(), now: Date.now() });
       },
       toCrossroads() {
         dispatch({ type: 'TO_CROSSROADS' });

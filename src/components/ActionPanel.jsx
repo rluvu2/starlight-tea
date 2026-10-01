@@ -1,7 +1,7 @@
 import { m } from 'framer-motion';
 import { playSfx } from '../audio/engine.js';
-import { AD_GATE_TEXT, ADVICE_TEXT, GUEST_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
-import { isReflectionReady, PHASE, useGameState } from '../hooks/useGameState.js';
+import { AD_GATE_TEXT, ADVICE_TEXT, GUEST_TEXT, PICK_TEXT, REFLECTION_TEXT, STAR_REWARD_TEXT } from '../data/scripts.js';
+import { isGuestReady, isReflectionReady, PHASE, useGameState } from '../hooks/useGameState.js';
 import { partOf, PICK } from '../logic/blend.js';
 import { guestById, INGREDIENT_LIST, ingredientById } from '../logic/gameData.js';
 import { fill } from '../logic/josa.js';
@@ -9,7 +9,7 @@ import { isAdAvailable } from '../utils/adService.js';
 import { ingredientIconUrl } from '../utils/assets.js';
 import { haptic } from '../utils/haptics.js';
 import { TapButton } from './Buttons.jsx';
-import { SparkleIcon, StarIcon } from './icons.jsx';
+import { StarIcon } from './icons.jsx';
 
 const softText = (color) => `color-mix(in srgb, ${color} 62%, white)`;
 const idFor = (blend, mode) => (blend ? (mode === PICK.FRUIT ? blend.fruitId : blend.leafId) : null);
@@ -19,27 +19,26 @@ function usePanelModel() {
   const { state, actions } = useGameState();
   const { phase, guest, reflection, advice, adStatus } = state;
 
+  // Phase 1: 손님에게도 찻잎 하나 + 과일 하나. 맞힌 쪽은 고정되고, 아쉬웠던 재료는 다시 고를 수 없다
   if (phase === PHASE.GUEST && guest) {
     const guestData = guestById(guest.id);
+    const mode = guest.pickMode;
     const choosing = guest.step === 'talking' || guest.step === 'missed';
-    let header = { text: GUEST_TEXT.panelLabel };
-    if (guest.step === 'comforted') {
-      header = { text: fill(STAR_REWARD_TEXT, { name: guestData?.name ?? '' }), reward: guest.reward };
-    } else if (guest.hint) {
-      header = { text: guest.hint, hint: true };
-    }
+    const comforted = guest.step === 'comforted';
     return {
-      header,
-      mode: PICK.LEAF, // 손님에게는 찻잎 하나로 우린 차를 내어 드린다
-      selectable: choosing,
-      selectedId: choosing ? guest.selectedId : guest.servedId,
-      tried: guest.tried,
+      tabs: comforted ? null : { mode, onChange: actions.setPickMode, leafId: guest.leafId, fruitId: guest.fruitId, solved: guest.solved },
+      header: comforted ? { text: fill(STAR_REWARD_TEXT, { name: guestData?.name ?? '' }), reward: guest.reward } : null,
+      mode,
+      selectable: choosing && !guest.solved[mode],
+      selectedId: idFor(guest, mode),
+      solvedId: guest.solved[mode] ? idFor(guest, mode) : null,
+      tried: guest.tried[mode],
       fab:
         guest.step === 'serving'
           ? { label: GUEST_TEXT.servingButton, disabled: true, loading: true }
-          : guest.step === 'comforted'
+          : comforted
             ? { label: GUEST_TEXT.continueButton, onClick: actions.toCrossroads, sound: 'farewell' }
-            : { label: GUEST_TEXT.serveButton, onClick: actions.serve, disabled: !guest.selectedId, sound: 'serve', feel: 'medium' },
+            : { label: GUEST_TEXT.serveButton, onClick: actions.serve, disabled: !isGuestReady(guest), sound: 'serve', feel: 'medium' },
       onSelect: actions.select,
     };
   }
@@ -99,11 +98,19 @@ function usePanelModel() {
   return { header: { text: '' }, mode: PICK.LEAF, selectable: false, selectedId: null, tried: [], fab: null };
 }
 
-/** [찻잎 | 과일] 탭 — 고른 재료가 있으면 이름과 아이콘을 함께 보여 준다 */
-function PickTabs({ mode, onChange, leafId, fruitId }) {
+function CheckMark({ className }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="m5 12 5 5 9-10" />
+    </svg>
+  );
+}
+
+/** [찻잎 | 과일] 탭 — 고른 재료가 있으면 이름과 아이콘을, 손님 마음에 맞은 쪽에는 ✓ 를 보여 준다 */
+function PickTabs({ mode, onChange, leafId, fruitId, solved }) {
   const items = [
-    [PICK.LEAF, REFLECTION_TEXT.leafTab, partOf(ingredientById(leafId), PICK.LEAF)],
-    [PICK.FRUIT, REFLECTION_TEXT.fruitTab, partOf(ingredientById(fruitId), PICK.FRUIT)],
+    [PICK.LEAF, PICK_TEXT.leafTab, partOf(ingredientById(leafId), PICK.LEAF), solved?.leaf],
+    [PICK.FRUIT, PICK_TEXT.fruitTab, partOf(ingredientById(fruitId), PICK.FRUIT), solved?.fruit],
   ];
   return (
     <div
@@ -116,7 +123,7 @@ function PickTabs({ mode, onChange, leafId, fruitId }) {
         className="absolute bottom-0.5 left-0.5 top-0.5 w-[calc(50%-2px)] rounded-full bg-white/12 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.08)] transition-transform duration-300 ease-out"
         style={{ transform: mode === PICK.FRUIT ? 'translateX(100%)' : 'none' }}
       />
-      {items.map(([key, label, part]) => {
+      {items.map(([key, label, part, done]) => {
         const active = mode === key;
         return (
           <button
@@ -135,8 +142,14 @@ function PickTabs({ mode, onChange, leafId, fruitId }) {
             {part && <img src={ingredientIconUrl(part.icon)} alt="" draggable={false} className="h-5 w-5 shrink-0" />}
             <span className={active ? 'text-ink-100' : 'text-ink-400'}>{label}</span>
             <span className={`truncate font-serif ${part ? '' : 'text-ink-400'}`} style={part ? { color: softText(part.color) } : undefined}>
-              {part ? part.name : REFLECTION_TEXT.emptyPick}
+              {part ? part.name : PICK_TEXT.emptyPick}
             </span>
+            {done && (
+              <span className="grid h-4 w-4 shrink-0 place-items-center rounded-full bg-lamp-300 text-night-900">
+                <CheckMark className="h-2.5 w-2.5" />
+                <span className="sr-only">, 손님 마음에 꼭 맞았어요</span>
+              </span>
+            )}
           </button>
         );
       })}
@@ -144,27 +157,33 @@ function PickTabs({ mode, onChange, leafId, fruitId }) {
   );
 }
 
-function IngredientTile({ ingredient, mode, selected, tried, recommended, selectable, onSelect }) {
+function IngredientTile({ ingredient, mode, selected, tried, solved, recommended, selectable, onSelect }) {
   const disabled = !selectable || tried;
   const part = partOf(ingredient, mode);
+  const notes = [tried && '아쉬웠던 재료', solved && '손님 마음에 꼭 맞은 재료', recommended && '팽주가 권하는 재료'].filter(Boolean);
   return (
     <m.button
       type="button"
       disabled={disabled}
       aria-pressed={selected}
-      aria-label={`${part.name} (${ingredient.virtue})${tried ? ', 이미 드린 차' : ''}${recommended ? ', 팽주가 권하는 재료' : ''}`}
+      aria-label={[`${part.name} (${ingredient.virtue})`, ...notes].join(', ')}
       whileTap={disabled ? undefined : { scale: 0.93 }}
       onClick={() => {
         onSelect?.(ingredient.id);
         playSfx('select');
         haptic('light');
       }}
-      className={`relative flex min-h-12 items-center gap-1.5 rounded-2xl border px-2 text-left transition-[background-color,border-color,box-shadow,opacity] duration-200 ${
+      className={`relative flex min-h-12 items-center gap-1.5 rounded-2xl border px-2 text-left transition-[background-color,border-color,box-shadow,opacity] duration-200 [@media(max-width:380px)]:gap-1 [@media(max-width:380px)]:px-1.5 ${
         selected ? 'bg-white/12' : 'border-white/8 bg-white/4'
       } ${tried ? 'opacity-35' : !selectable && !selected && !recommended ? 'opacity-55' : ''}`}
       style={selected || recommended ? { borderColor: part.color, boxShadow: `0 0 0 1px ${part.color}, 0 0 20px -6px ${part.color}` } : undefined}
     >
-      <img src={ingredientIconUrl(part.icon)} alt="" draggable={false} className="h-8 w-8 shrink-0" />
+      <img
+        src={ingredientIconUrl(part.icon)}
+        alt=""
+        draggable={false}
+        className="h-8 w-8 shrink-0 [@media(max-width:380px)]:h-7 [@media(max-width:380px)]:w-7"
+      />
       <span className="min-w-0">
         <span className="block truncate text-[14px] leading-tight text-ink-100">{part.name}</span>
         <span className="block truncate text-[10.5px] leading-tight" style={{ color: softText(part.color) }}>
@@ -173,12 +192,17 @@ function IngredientTile({ ingredient, mode, selected, tried, recommended, select
       </span>
       {tried && (
         <span
-          className="absolute -right-1 -top-1.5 grid h-5 w-5 place-items-center rounded-full border border-white/20 bg-night-700 text-ink-200 shadow"
-          title="이미 드린 차"
+          className="absolute -right-1 -top-1.5 grid h-5 w-5 place-items-center rounded-full border border-white/20 bg-night-700 text-ink-300 shadow"
+          title="아쉬웠던 재료"
         >
-          <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="m5 12 5 5 9-10" />
+          <svg viewBox="0 0 24 24" className="h-2.5 w-2.5" fill="none" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" aria-hidden="true">
+            <path d="M7 7l10 10M17 7 7 17" />
           </svg>
+        </span>
+      )}
+      {solved && (
+        <span className="absolute -right-1 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-lamp-300 text-night-900 shadow" title="손님 마음에 꼭 맞은 재료">
+          <CheckMark className="h-3 w-3" />
         </span>
       )}
       {recommended && (
@@ -231,14 +255,6 @@ function PanelHeader({ header }) {
           </span>
           <span className="break-keep text-lamp-200">{header.text}</span>
         </>
-      ) : header.hint ? (
-        <>
-          <SparkleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-lamp-300" />
-          <span className="break-keep text-lamp-200">
-            <b className="mr-1 font-normal text-lamp-300">{GUEST_TEXT.hintLabel}</b>
-            {header.text}
-          </span>
-        </>
       ) : (
         <span className="text-ink-300">{header.text}</span>
       )}
@@ -267,6 +283,7 @@ export default function ActionPanel({ tapOverlay }) {
             ingredient={ingredient}
             mode={model.mode}
             selected={model.selectedId === ingredient.id}
+            solved={model.solvedId === ingredient.id}
             recommended={model.recommendedId === ingredient.id}
             tried={model.tried.includes(ingredient.id)}
             selectable={model.selectable}

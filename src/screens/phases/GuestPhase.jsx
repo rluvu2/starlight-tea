@@ -5,20 +5,24 @@ import { playSfx } from '../../audio/engine.js';
 import GuestImage, { probeHappyImage } from '../../components/GuestImage.jsx';
 import { launchMeteors } from '../../components/NightSky.jsx';
 import SparkleBurst from '../../components/SparkleBurst.jsx';
-import { StarIcon } from '../../components/icons.jsx';
+import { SparkleIcon, StarIcon } from '../../components/icons.jsx';
 import { GlassCup, Steam } from '../../components/teaware.jsx';
-import { OWNER_NAME } from '../../data/scripts.js';
+import { GUEST_TEXT, OWNER_NAME, PICK_TEXT } from '../../data/scripts.js';
 import { PHASE, useGameState } from '../../hooks/useGameState.js';
 import { useTypewriter } from '../../hooks/useTypewriter.js';
-import { guestById, ingredientById } from '../../logic/gameData.js';
+import { blendColor, PICK } from '../../logic/blend.js';
+import { guestById } from '../../logic/gameData.js';
+import { fill } from '../../logic/josa.js';
 import { haptic } from '../../utils/haptics.js';
 
 const SERVING_MS = 1900; // 손님이 차를 마시는 시간
+// 찻잎이나 과일 한쪽은 맞았을 때 (자리가 바뀐 것도 두 재료는 맞힌 셈이다)
+const PARTIAL_RESULTS = ['leafOnly', 'fruitOnly', 'swapped'];
 
 // 같은 반응이 화면을 다시 그릴 때 반복되지 않도록 기억해 둔다
 let lastReaction = null;
 
-function reactionFor(step) {
+function reactionFor(step, result) {
   if (step === 'serving') {
     return {
       animate: { y: [0, 0, 6, 0, 6, 0], rotate: [0, 0, -2, 0, -2, 0], scale: 1, filter: 'brightness(1)' },
@@ -27,6 +31,13 @@ function reactionFor(step) {
   }
   if (step === 'comforted') {
     return { animate: { y: 0, rotate: 0, scale: 1.03, filter: 'brightness(1.08)' }, transition: { duration: 1.4, ease: 'easeOut' } };
+  }
+  if (step === 'missed' && PARTIAL_RESULTS.includes(result)) {
+    // 반쯤 맞았을 때: 고개를 작게 끄덕인 뒤 갸웃
+    return {
+      animate: { y: [0, 5, 0, 5, 0, 0], rotate: [0, 0, 0, 0, -2, 0], scale: 1, filter: 'brightness(1.03)' },
+      transition: { duration: 1.6, times: [0, 0.15, 0.3, 0.45, 0.7, 1], ease: 'easeInOut' },
+    };
   }
   if (step === 'missed') {
     return { animate: { y: 0, rotate: [0, -3, -3, 0], scale: 1, filter: 'brightness(1)' }, transition: { duration: 1.4, ease: 'easeInOut' } };
@@ -40,7 +51,7 @@ export function GuestSprite() {
   const { phase, guest, visitKey } = state;
   const data = guest ? guestById(guest.id) : null;
   const visible = phase === PHASE.GUEST && data;
-  const reaction = reactionFor(guest?.step);
+  const reaction = reactionFor(guest?.step, guest?.result);
 
   useEffect(() => {
     if (data) probeHappyImage(data.appearance); // 정답 뒤 바뀔 표정 그림을 미리 확인
@@ -97,17 +108,16 @@ export function GuestSprite() {
   );
 }
 
-/** 카운터 위에 내려놓은 찻잔 */
+/** 카운터 위에 내려놓은 찻잔 (찻잎 빛깔에 과일 빛깔을 조금 섞은 찻물) */
 export function GuestCup() {
   const { state } = useGameState();
   const { phase, guest, visitKey } = state;
-  const served = guest?.servedId ? ingredientById(guest.servedId) : null;
-  const visible = phase === PHASE.GUEST && served && guest.step !== 'talking';
+  const visible = phase === PHASE.GUEST && guest?.served && guest.step !== 'talking';
   return (
     <AnimatePresence>
       {visible && (
         <m.div
-          key={`${visitKey}-${guest.tried.length}`}
+          key={`${visitKey}-${guest.misses}`}
           className="absolute bottom-[calc(100%-10px)] left-1/2 w-[19%] max-w-[74px] -translate-x-1/2"
           initial={{ opacity: 0, y: 24, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -116,7 +126,7 @@ export function GuestCup() {
         >
           <Steam className="absolute -top-[52%] left-1/2 w-[62%] -translate-x-1/2" />
           <GlassCup
-            color={served.color}
+            color={blendColor(guest.served)}
             level={0.45}
             initialLevel={1}
             transition={{ delay: 0.8, duration: 1.4, ease: 'easeInOut' }}
@@ -128,9 +138,13 @@ export function GuestCup() {
   );
 }
 
-function SpeechBubble({ line, guestName }) {
+/**
+ * 손님의 말풍선. hint 가 있으면 말을 다 한 뒤 아래에 팽주의 귀띔을 덧붙인다.
+ * (작은 화면에서는 재료 칸 위에 귀띔을 둘 자리가 없어서 말풍선 안에 둔다)
+ */
+function SpeechBubble({ line, guestName, hint }) {
   const reduceMotion = useReducedMotion();
-  const { shown } = useTypewriter(line.text, { instant: reduceMotion, speed: 32 });
+  const { shown, done } = useTypewriter(line.text, { instant: reduceMotion, speed: 32 });
   const nameTag = line.speaker === 'guest' ? guestName : line.speaker === 'owner' ? OWNER_NAME : null;
   return (
     <div className="relative rounded-[22px] border border-white/10 bg-night-800/85 px-4 pb-3.5 pt-4 shadow-[0_16px_40px_-18px_rgba(0,0,0,0.9)] backdrop-blur-md">
@@ -147,6 +161,28 @@ function SpeechBubble({ line, guestName }) {
       >
         {shown}
       </p>
+      <AnimatePresence initial={false}>
+        {hint && done && (
+          <m.div
+            key={hint.text}
+            className="overflow-hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.45, ease: 'easeOut' }}
+          >
+            <p aria-live="polite" className="mt-2 flex gap-1.5 border-t border-white/8 pt-2 text-[12.5px] leading-snug text-lamp-200">
+              <SparkleIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-lamp-300" />
+              <span className="break-keep">
+                <b className="mr-1.5 whitespace-nowrap rounded-full bg-lamp-300/15 px-1.5 py-px font-normal text-lamp-300">
+                  {fill(GUEST_TEXT.hintLabel, { part: hint.part === PICK.FRUIT ? PICK_TEXT.fruitTab : PICK_TEXT.leafTab })}
+                </b>
+                {hint.text}
+              </span>
+            </p>
+          </m.div>
+        )}
+      </AnimatePresence>
       {/* 말꼬리 */}
       <span className="absolute -bottom-[7px] left-1/2 h-3.5 w-3.5 -translate-x-1/2 rotate-45 border-b border-r border-white/10 bg-night-800/85" />
     </div>
@@ -208,7 +244,7 @@ export function GuestOverlay() {
   // 결과 반응 (같은 결과는 한 번만)
   useEffect(() => {
     if (guest?.step !== 'comforted' && guest?.step !== 'missed') return;
-    const key = `${visitKey}-${guest.tried.length}-${guest.step}`;
+    const key = `${visitKey}-${guest.misses}-${guest.step}`;
     if (lastReaction === key) return;
     lastReaction = key;
     if (guest.step === 'comforted') {
@@ -216,17 +252,20 @@ export function GuestOverlay() {
       haptic('success');
       launchMeteors(4);
       setTimeout(() => playSfx('star'), 1400);
+    } else if (PARTIAL_RESULTS.includes(guest.result)) {
+      playSfx('select');
+      haptic('light');
     } else {
       playSfx('soft');
       haptic('soft');
     }
-  }, [guest?.step, guest?.tried.length, visitKey]);
+  }, [guest?.step, guest?.misses, guest?.result, visitKey]);
 
   if (!guest || !data) return null;
   return (
     <m.div className="pointer-events-none absolute inset-0 z-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="absolute inset-x-4 top-[min(12cqw,52px)]">
-        <SpeechBubble line={guest.line} guestName={data.name} />
+        <SpeechBubble line={guest.line} guestName={data.name} hint={guest.step === 'missed' ? guest.hint : null} />
       </div>
       <div
         ref={anchor}

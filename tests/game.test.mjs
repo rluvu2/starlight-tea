@@ -1,13 +1,23 @@
 import assert from 'node:assert/strict';
 // 별빛 찻집 단위 테스트: npm test (배포 전에 GitHub Actions 에서도 실행)
-// 상태 머신 · 블렌딩 규칙 · 팽주의 조언 · 데이터 검증 · 세이브 병합 · 광고 서비스
+// 상태 머신 · 손님 난이도와 방문 순서 · 블렌딩 규칙 · 팽주의 조언 · 데이터 검증 · 세이브 병합 · 광고 서비스
 const root = new URL('../src/', import.meta.url).href;
 const gs = await import(root + 'hooks/useGameState.js');
 const { PHASE, gameReducer: reduce, createInitialState, createDefaultSave, mergeSave, migrateLegacySave, loadSave, writeSave, buildCollection, SAVE_KEY, LEGACY_SAVE_KEY } = gs;
-const { GUEST_LIST } = await import(root + 'logic/gameData.js');
+const { GUEST_LIST, guestById, ingredientById } = await import(root + 'logic/gameData.js');
 const { analyzeWorry } = await import(root + 'logic/advisor.js');
-const { decideBlend, blendName, blendLine, blendParts, isSameBlend, mixHex } = await import(root + 'logic/blend.js');
+const { decideBlend, blendName, blendLine, blendParts, isSameBlend, mixHex, tasteBlend } = await import(root + 'logic/blend.js');
 const { fill } = await import(root + 'logic/josa.js');
+const { pickNextGuest } = await import(root + 'logic/pickGuest.js');
+
+// 손님에게 찻잎과 과일을 골라 내어 드리고, 다 마실 때까지 기다린다
+const serve = (state, leafId, fruitId, extra = {}) => {
+  let next = state;
+  if (leafId != null) next = reduce(reduce(next, { type: 'SET_PICK_MODE', mode: 'leaf' }), { type: 'SELECT', ingredientId: leafId });
+  if (fruitId != null) next = reduce(reduce(next, { type: 'SET_PICK_MODE', mode: 'fruit' }), { type: 'SELECT', ingredientId: fruitId });
+  next = reduce(next, { type: 'SERVE', sipLine: '.' });
+  return reduce(next, { type: 'RESOLVE_SERVE', roll: 0, now: 1, ...extra });
+};
 
 // ── 1. 상태 머신: Phase 1 → 2(로비) → 3 → 3.5 → 4 → 2 ──
 let s = createInitialState();
@@ -17,27 +27,48 @@ assert.equal(reduce(s, { type: 'TO_CROSSROADS' }), s, '첫 손님 전에는 로�
 s = reduce(s, { type: 'SHOW_INTRO' }); assert.equal(s.phase, PHASE.INTRO);
 assert.equal(reduce(s, { type: 'START_REFLECTION' }), s);
 s = reduce(s, { type: 'MARK_INTRO_SEEN' });
+// 지친 직장인 곰: 찻잎 호지차(8 온유) + 과일 딸기(1 사랑)
 s = reduce(s, { type: 'START_GUEST', guestId: 'guest_001' });
 assert.equal(s.phase, PHASE.GUEST); assert.equal(s.guest.step, 'talking'); assert.equal(s.save.visits.guest_001, 1);
 assert.equal(reduce(s, { type: 'START_REFLECTION' }), s, '손님 맞이 중에는 나를 위한 차로 갈 수 없다');
 assert.equal(reduce(s, { type: 'SERVE', sipLine: '...' }), s, '선택 없이 차를 낼 수 없다');
 assert.equal(reduce(s, { type: 'TO_CROSSROADS' }), s, '정답 전에는 로비로 갈 수 없다');
 s = reduce(s, { type: 'SELECT', ingredientId: 2 });
+assert.equal(s.guest.leafId, 2); assert.equal(s.guest.pickMode, 'fruit', '손님에게도 찻잎을 고르면 과일 탭으로');
+assert.equal(reduce(s, { type: 'SERVE', sipLine: '...' }), s, '과일 없이는 차를 낼 수 없다');
+s = reduce(s, { type: 'SELECT', ingredientId: 5 });
 s = reduce(s, { type: 'SERVE', sipLine: '한 모금' }); assert.equal(s.guest.step, 'serving');
+assert.deepEqual(s.guest.served, { leafId: 2, fruitId: 5 });
 assert.equal(reduce(s, { type: 'SELECT', ingredientId: 3 }), s, '마시는 중에는 바꿀 수 없다');
-s = reduce(s, { type: 'RESOLVE_SERVE', fallbackLine: 'F1', now: 1 });
-assert.equal(s.guest.step, 'missed'); assert.deepEqual(s.guest.tried, [2]); assert.equal(s.guest.hint, null); assert.equal(s.save.stars, 0);
-assert.equal(reduce(s, { type: 'SELECT', ingredientId: 2 }), s, '이미 드린 차는 다시 못 고른다');
-s = reduce(reduce(reduce(s, { type: 'SELECT', ingredientId: 5 }), { type: 'SERVE', sipLine: '.' }), { type: 'RESOLVE_SERVE', fallbackLine: 'F2', now: 2 });
-assert.ok(s.guest.hint?.startsWith('가만히 보니'), '두 번째 오답부터 귀띔');
+s = reduce(s, { type: 'RESOLVE_SERVE', roll: 0, now: 1 });
+// 백차 + 무화과: 둘 다 아쉬움 → 둘 다 비우고 찻잎 탭부터
+assert.equal(s.guest.step, 'missed'); assert.equal(s.guest.result, 'none');
+assert.deepEqual(s.guest.tried, { leaf: [2], fruit: [5] }); assert.deepEqual(s.guest.solved, { leaf: false, fruit: false });
+assert.equal(s.guest.leafId, null); assert.equal(s.guest.fruitId, null); assert.equal(s.guest.pickMode, 'leaf');
+assert.ok(s.guest.line.text.includes('찻잎도 과일도'), '둘 다 아쉽다고 말한다');
+assert.equal(s.guest.hint, null, '처음 아쉬울 때는 귀띔 없음'); assert.equal(s.save.stars, 0);
+assert.equal(reduce(s, { type: 'SELECT', ingredientId: 2 }), s, '아쉬웠던 찻잎은 다시 못 고른다');
+// 호지차 + 청포도: 찻잎만 맞음 → 찻잎은 고정, 과일 탭으로
+s = serve(s, 8, 6, { now: 2 });
+assert.equal(s.guest.result, 'leafOnly');
+assert.equal(s.guest.line.text, '호지차 향은 참 좋아요. 그런데 청포도는 지금 제 마음과 조금 다른 것 같아요.', '어느 쪽이 맞았는지 알려 준다');
+assert.deepEqual(s.guest.solved, { leaf: true, fruit: false }); assert.equal(s.guest.leafId, 8, '맞힌 찻잎은 그대로');
+assert.equal(s.guest.fruitId, null); assert.equal(s.guest.pickMode, 'fruit', '아쉬운 과일 탭으로');
+assert.deepEqual(s.guest.tried, { leaf: [2], fruit: [5, 6] });
+assert.deepEqual(s.guest.hint, { part: 'fruit', text: `가만히 보니, ${ingredientById(1).hint}` }, '두 번째부터 아직 못 맞힌 과일의 귀띔');
+const onLeafTab = reduce(s, { type: 'SET_PICK_MODE', mode: 'leaf' });
+assert.equal(onLeafTab.guest.pickMode, 'leaf', '손님 맞이에서도 탭을 바꿔 볼 수 있다');
+assert.equal(reduce(onLeafTab, { type: 'SELECT', ingredientId: 3 }), onLeafTab, '맞힌 찻잎은 바꿀 수 없다');
 assert.equal(s.tonight.guests, 0);
-s = reduce(reduce(reduce(s, { type: 'SELECT', ingredientId: 8 }), { type: 'SERVE', sipLine: '.' }), { type: 'RESOLVE_SERVE', fallbackLine: 'F3', now: 1000 });
-assert.equal(s.guest.step, 'comforted'); assert.equal(s.guest.reward, 3); assert.equal(s.save.stars, 3, '정답 1 + 첫 해금 2');
+s = serve(s, null, 1, { now: 1000 });
+assert.equal(s.guest.step, 'comforted'); assert.equal(s.guest.result, 'match'); assert.equal(s.guest.reward, 3); assert.equal(s.save.stars, 3, '정답 1 + 첫 해금 2');
 assert.equal(s.tonight.guests, 1, '로비: 오늘 맞이한 손님');
-assert.deepEqual(s.save.collection.guest_001, { firstAt: 1000, count: 1, ingredientId: 8 });
+assert.deepEqual(s.save.collection.guest_001, { firstAt: 1000, count: 1, leafId: 8, fruitId: 1 }, '도감에 찻잎과 과일을 함께 남긴다');
+assert.equal(reduce(s, { type: 'SELECT', ingredientId: 4 }), s, '마음을 데운 뒤에는 고를 수 없다');
 s = reduce(s, { type: 'TO_CROSSROADS' }); assert.equal(s.phase, PHASE.CROSSROADS, '첫 손님을 배웅하면 로비');
 s = reduce(s, { type: 'START_GUEST', guestId: 'guest_001' });
-s = reduce(reduce(reduce(s, { type: 'SELECT', ingredientId: 8 }), { type: 'SERVE', sipLine: '.' }), { type: 'RESOLVE_SERVE', fallbackLine: 'F', now: 5 });
+assert.deepEqual(s.guest.tried, { leaf: [], fruit: [] }, '다시 찾아오면 처음부터');
+s = serve(s, 8, 1, { now: 5 });
 assert.equal(s.save.stars, 4, '두 번째 위로는 별조각 1개'); assert.equal(s.save.collection.guest_001.count, 2); assert.equal(s.save.collection.guest_001.firstAt, 1000);
 s = reduce(s, { type: 'TO_CROSSROADS' });
 s = reduce(s, { type: 'START_REFLECTION' }); assert.equal(s.phase, PHASE.REFLECTION);
@@ -69,6 +100,53 @@ const reset = reduce({ ...s, save: { ...s.save, settings: { music: false, sfx: t
 assert.equal(reset.save.stars, 0); assert.equal(reset.save.settings.music, false, '초기화해도 설정은 유지'); assert.equal(reset.phase, PHASE.TITLE);
 assert.deepEqual(reset.tonight, { guests: 0, teas: 0 });
 console.log('✓ 상태 머신 Phase 1→2(로비)→3→3.5→4→2, 첫 손님 먼저, 찻잎+과일 고르기, 오답/귀띔/별조각/도감/초기화');
+
+// ── 1-a. 손님에게 찻잎 + 과일: 맞힌 쪽 알려 주기, 자리 바뀜, 같은 대사 반복 방지 ──
+assert.equal(tasteBlend({ leafId: 8, fruitId: 1 }, { leafId: 8, fruitId: 1 }), 'match');
+assert.equal(tasteBlend({ leafId: 8, fruitId: 2 }, { leafId: 8, fruitId: 1 }), 'leafOnly');
+assert.equal(tasteBlend({ leafId: 2, fruitId: 1 }, { leafId: 8, fruitId: 1 }), 'fruitOnly');
+assert.equal(tasteBlend({ leafId: 1, fruitId: 8 }, { leafId: 8, fruitId: 1 }), 'swapped', '찻잎과 과일의 자리가 바뀜');
+assert.equal(tasteBlend({ leafId: 1, fruitId: 2 }, { leafId: 8, fruitId: 1 }), 'none', '한쪽 열매만 겹쳐도 자리가 다르면 아쉬움');
+const meet = (guestId) => reduce({ ...createInitialState(), phase: PHASE.CROSSROADS }, { type: 'START_GUEST', guestId });
+// 잠 못 드는 아기 양: 캐모마일(3) + 복숭아(3). 과일만 맞으면 과일은 고정하고 찻잎 탭으로
+let lamb = serve(meet('guest_002'), 1, 3);
+assert.equal(lamb.guest.result, 'fruitOnly');
+assert.equal(lamb.guest.line.text, '복숭아는 정말 반가운 맛이에요. 그런데 홍차 향이 조금 아쉬워요.');
+assert.deepEqual(lamb.guest.solved, { leaf: false, fruit: true }); assert.equal(lamb.guest.fruitId, 3); assert.equal(lamb.guest.pickMode, 'leaf');
+assert.equal(reduce(reduce(lamb, { type: 'SET_PICK_MODE', mode: 'fruit' }), { type: 'SELECT', ingredientId: 4 }).guest.fruitId, 3, '맞힌 과일은 바꿀 수 없다');
+lamb = reduce(lamb, { type: 'SELECT', ingredientId: 3 });
+assert.equal(lamb.guest.pickMode, 'leaf', '과일이 이미 있으면 탭은 그대로');
+lamb = reduce(reduce(lamb, { type: 'SERVE', sipLine: '.' }), { type: 'RESOLVE_SERVE', roll: 0, now: 9 });
+assert.equal(lamb.guest.step, 'comforted', '캐모마일 복숭아차');
+// 곰에게 홍차 + 배: 정답(호지차 + 딸기)과 자리만 바뀜
+const bear = serve(meet('guest_001'), 1, 8);
+assert.equal(bear.guest.result, 'swapped');
+assert.ok(bear.guest.line.text.startsWith('홍차와 배…') && bear.guest.line.text.includes('자리가 바뀐'), '자리가 바뀌었다고 알려 준다');
+assert.deepEqual(bear.guest.tried, { leaf: [1], fruit: [8] });
+// 같은 대사가 연달아 나오지 않는다
+const twice = serve(serve(meet('guest_001'), 2, 5), 3, 6);
+assert.equal(twice.guest.result, 'none');
+assert.notEqual(twice.guest.line.text, serve(meet('guest_001'), 2, 5).guest.line.text, '직전 대사는 피한다');
+assert.deepEqual(twice.guest.hint, { part: 'leaf', text: `가만히 보니, ${ingredientById(8).hint}` }, '둘 다 아쉬우면 찻잎 귀띔부터');
+assert.equal(serve(meet('guest_001'), 2, 5, { roll: undefined }).guest.line.text.length > 0, true, 'roll 이 없어도 대사를 고른다');
+
+// 난이도와 방문 순서: 아직 마음을 데우지 못한 손님 중 가장 쉬운 단계부터
+assert.deepEqual(GUEST_LIST.map((g) => [g.id, g.level]), [['guest_002', 1], ['guest_003', 2], ['guest_001', 3]]);
+for (const g of GUEST_LIST.filter((g) => g.level === 1)) {
+  assert.ok(g.story.includes(ingredientById(g.required_leaf).name) && g.story.includes(ingredientById(g.required_fruit).fruit.name), `${g.name}: 쉬움은 정답 이름이 사연에 보인다`);
+}
+const comforted = (...ids) => ({ collection: Object.fromEntries(ids.map((id) => [id, { count: 1 }])) });
+for (const roll of [0, 0.5, 0.99]) assert.equal(pickNextGuest(GUEST_LIST, {}, () => roll).id, 'guest_002', '처음엔 언제나 쉬운 손님');
+assert.equal(pickNextGuest(GUEST_LIST, comforted('guest_002')).id, 'guest_003', '쉬움 다음은 보통');
+assert.equal(pickNextGuest(GUEST_LIST, comforted('guest_002', 'guest_003')).id, 'guest_001', '그다음 어려움');
+assert.equal(pickNextGuest(GUEST_LIST, comforted('guest_001')).id, 'guest_002', '어려운 손님만 데웠던 옛 기록도 쉬운 손님부터');
+assert.equal(pickNextGuest(GUEST_LIST, { ...comforted('guest_003'), lastGuestId: 'guest_002' }).id, 'guest_002', '아직 못 데운 손님은 연달아 와도 된다');
+const all = { ...comforted('guest_001', 'guest_002', 'guest_003'), lastGuestId: 'guest_002' };
+for (const roll of [0, 0.5, 0.99]) assert.notEqual(pickNextGuest(GUEST_LIST, all, () => roll).id, 'guest_002', '모두 데운 뒤에는 직전 손님만 빼고');
+const twins = [{ id: 'a', level: 1 }, { id: 'b', level: 1 }, { id: 'c', level: 2 }];
+assert.equal(pickNextGuest(twins, {}, () => 0).id, 'a'); assert.equal(pickNextGuest(twins, {}, () => 0.99).id, 'b', '같은 단계끼리는 무작위');
+assert.equal(pickNextGuest([], {}), null);
+console.log('✓ 손님: 찻잎+과일 내기, 맞힌 쪽 고정·알려 주기, 자리 바뀜, 귀띔(못 맞힌 쪽), 난이도 순서(쉬움→보통→어려움)');
 
 // ── 1-b. 블렌딩 규칙 (2위가 1위의 20% 이상일 때만 과일로) ──
 const r = (pairs) => pairs.map(([label, share]) => ({ label, share }));
@@ -114,17 +192,42 @@ assert.deepEqual(unknownAdvice.mood, []);
 const negated = analyzeWorry('화가 안 나요. 그냥 요즘 외롭고 아무도 저를 사랑하지 않는 것 같아요', { leafId: 8, fruitId: 8 });
 assert.equal(negated.recommended.leafId, 1, '"화가 안 나요"는 화로 읽지 않는다 → 사랑');
 // 기획 데이터 검증: 과일이 빠진 열매, 잘못된 색, 잘못된 블렌딩 비율
-const { validateGameData, validateBlendData } = await import(root + 'logic/validateData.js');
+const { validateGameData, validateBlendData, DEFAULT_GUEST_LEVEL } = await import(root + 'logic/validateData.js');
 const { INGREDIENTS } = await import(root + 'data/ingredients.js');
 const broken = validateGameData({
   guests: [],
   ingredients: [...INGREDIENTS.slice(0, 7), { ...INGREDIENTS[7], fruit: undefined }, { ...INGREDIENTS[8], color: '연두' }],
-  fallbackDialogues: [],
+  missDialogues: {},
 });
 assert.equal(broken.ingredients.length, 8, '과일이 빠진 열매는 제외');
 assert.ok(broken.errors.some((e) => e.problems.some((p) => p.includes('"fruit"'))));
 assert.ok(broken.warnings.some((w) => w.includes('16진수 색')), '색 형식 경고');
 assert.ok(broken.warnings.some((w) => w.includes('9가지(3×3 칸)')), '열매 수 경고');
+assert.deepEqual(Object.keys(broken.missDialogues), ['leafOnly', 'fruitOnly', 'swapped', 'none'], '대사가 비어 있으면 기본 대사');
+assert.ok(broken.warnings.some((w) => w.includes('MISS_DIALOGUES.swapped')));
+// 손님: 찻잎·과일 정답과 난이도
+const guest = (extra) => ({ id: 'g', name: '손님', appearance: 'g.png', story: '사연', perfect_match_dialogue: '고마워요', required_leaf: 3, required_fruit: 3, level: 2, ...extra });
+const checked = validateGameData({
+  guests: [
+    guest({ id: 'no_fruit', required_fruit: undefined }),
+    guest({ id: 'bad_leaf', required_leaf: 12 }),
+    guest({ id: 'quoted', required_leaf: '8', required_fruit: '1' }),
+    guest({ id: 'no_level', level: undefined }),
+    guest({ id: 'easy_hidden', level: 1, story: '걱정이 많아 잠이 안 와요' }),
+    guest({ id: 'easy_shown', level: 1, story: '캐모마일 복숭아차가 그리워요' }),
+  ],
+  ingredients: INGREDIENTS,
+  missDialogues: { leafOnly: ['a'], fruitOnly: ['b'], swapped: ['c'], none: ['d'] },
+});
+assert.deepEqual(checked.guests.map((g) => g.id), ['quoted', 'no_level', 'easy_hidden', 'easy_shown'], '정답이 빠지거나 틀린 손님은 제외');
+assert.ok(checked.errors.some((e) => e.where.includes('no_fruit') && e.problems.some((p) => p.includes('"required_fruit"'))));
+assert.ok(checked.errors.some((e) => e.where.includes('bad_leaf') && e.problems.some((p) => p.includes('"required_leaf"'))));
+assert.deepEqual([checked.guests[0].required_leaf, checked.guests[0].required_fruit], [8, 1], '따옴표로 감싼 번호는 숫자로 읽는다');
+assert.ok(checked.warnings.some((w) => w.includes('quoted') && w.includes('따옴표')));
+assert.equal(checked.guests[1].level, DEFAULT_GUEST_LEVEL, 'level 이 없으면 가장 나중에');
+assert.ok(checked.warnings.some((w) => w.includes('easy_hidden') && w.includes('"캐모마일"') && w.includes('"복숭아"')), '쉬움인데 정답 이름이 안 보이면 경고');
+assert.ok(!checked.warnings.some((w) => w.includes('easy_shown')));
+assert.deepEqual(checked.missDialogues.none, ['d']);
 const badBlend = validateBlendData({ secondRatio: 1.5 }, { name: '' });
 assert.equal(badBlend.ratio, 0.2); assert.equal(badBlend.errors.length, 1); assert.equal(badBlend.texts.name, '{leaf} {fruit}차');
 assert.deepEqual(validateBlendData({ secondRatio: 0.3 }, { name: '{leaf}·{fruit}', blendLine: 'a', pureLine: 'b' }).errors, []);
@@ -141,11 +244,13 @@ const merged = mergeSave({
   future: { keep: true },
 });
 assert.equal(merged.stars, 0); assert.equal(merged.collection.guest_001.count, 1); assert.ok(merged.collection.ghost, '지금 없는 손님 기록도 보존');
+assert.deepEqual(merged.collection.ghost, { firstAt: 9, count: 2, leafId: 3, fruitId: null }, 'v2 의 ingredientId 는 찻잎으로 옮긴다');
 assert.equal(merged.collection.bad, undefined); assert.deepEqual(merged.visits, { a: 2 });
 assert.deepEqual(merged.settings, { music: false, sfx: true, haptics: true });
 assert.deepEqual(merged.future, { keep: true }, '모르는 필드는 버리지 않는다');
 const legacy = migrateLegacySave({ state: { nightCount: 4, comforted: { guest_002: { firstAt: 5, count: 2, ingredientId: 3 } }, visits: { guest_002: 3 }, lastGuestId: 'guest_002', seenIntro: true, settings: { music: false, sfx: true, haptics: true } }, version: 1 });
 assert.equal(legacy.stars, 4, '옛 기록: 2번 위로(2) + 첫 해금(2)'); assert.equal(legacy.seenIntro, true); assert.equal(legacy.settings.music, false);
+assert.deepEqual(legacy.collection.guest_002, { firstAt: 5, count: 2, leafId: 3, fruitId: null });
 const store = (init = {}) => {
   const m = new Map(Object.entries(init));
   return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), map: m };
@@ -159,11 +264,16 @@ assert.equal(loadSave(legacyStore).stars, 3);
 const st = store(); writeSave({ ...createDefaultSave(), stars: 7 }, st); assert.equal(loadSave(st).stars, 7);
 assert.equal(loadSave({ getItem() { throw new Error('denied'); }, setItem() { throw new Error('denied'); } }).stars, 0, '저장소 접근이 막혀도 동작');
 const view = buildCollection(
-  mergeSave({ collection: { guest_001: { firstAt: 1, count: 1, ingredientId: 8 }, removed_guest: { firstAt: 1, count: 1 } }, visits: { guest_002: 1 } }),
+  mergeSave({
+    collection: { guest_001: { firstAt: 1, count: 1, ingredientId: 8 }, guest_003: { firstAt: 2, count: 1, leafId: 4, fruitId: 4 }, removed_guest: { firstAt: 1, count: 1 } },
+    visits: { guest_002: 1 },
+  }),
   [...GUEST_LIST, { id: 'guest_999', name: '새 손님' }],
 );
-assert.deepEqual(view.map((v) => v.status), ['comforted', 'visited', 'unknown', 'unknown']);
-console.log('✓ 세이브 병합: 손상/옛 버전/모르는 필드/사라진 손님/새 손님/저장소 차단');
+assert.deepEqual(view.map((v) => v.status), ['visited', 'comforted', 'comforted', 'unknown']);
+assert.deepEqual(view[2].blend, { leafId: 8, fruitId: guestById('guest_001').required_fruit }, '예전 기록의 빠진 과일은 손님의 정답으로');
+assert.deepEqual(view[1].blend, { leafId: 4, fruitId: 4 }); assert.equal(view[0].blend, null);
+console.log('✓ 세이브 병합: 손상/옛 버전/모르는 필드/사라진 손님/새 손님/저장소 차단, 도감 기록 v2→v3(찻잎+과일)');
 
 // ── 3. 광고 서비스 ──
 globalThis.window = {};

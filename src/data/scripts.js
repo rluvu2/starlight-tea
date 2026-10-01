@@ -22,14 +22,23 @@ export const INTRO_LINES = [
 // 찻집 주인(팽주)의 이름표
 export const OWNER_NAME = "팽주";
 
+// ── 재료 칸 위의 [찻잎 | 과일] 탭 (손님 맞이와 나를 위한 차에서 함께 써요) ──
+// 아직 고르지 않았으면 "찻잎 고르기"처럼 보여요
+export const PICK_TEXT = {
+  leafTab: "찻잎",
+  fruitTab: "과일",
+  emptyPick: "고르기"
+};
+
 // ── Phase 1: 손님 맞이 ──────────────────────────────────────────────
+// 손님에게도 찻잎 하나와 과일 하나를 블렌딩해 내어 드려요. 맞힌 쪽은 그대로 두고 아쉬운 쪽만 다시 골라요.
 export const GUEST_TEXT = {
-  panelLabel: "어떤 차를 내어 드릴까요?",
   serveButton: "차 내어주기",
   servingButton: "차를 내어드리는 중…",
   continueButton: "계속하기",
   continueHint: "화면을 누르면 다음으로 넘어가요",
-  hintLabel: "팽주의 귀띔"
+  // 귀띔 앞의 꼬리표. {part} 는 아직 못 맞힌 쪽(찻잎 / 과일)
+  hintLabel: "{part} 귀띔"
 };
 
 // 차를 내어 드린 뒤 손님이 마시는 동안의 문장
@@ -38,7 +47,8 @@ export const SIP_LINES = [
   "따뜻한 김 너머로 {name}{이/가} 천천히 차를 음미해요…"
 ];
 
-// 같은 손님에게 두 번 이상 다른 차를 드렸을 때 재료의 hint 앞에 붙는 말
+// 두 번째로 아쉬운 차를 드렸을 때부터 손님 말 아래에 보여 주는 귀띔.
+// {hint} 는 아직 못 맞힌 쪽(찻잎 먼저, 그다음 과일) 열매의 hint 로 바뀌어요.
 export const HINT_TEMPLATE = "가만히 보니, {hint}";
 
 // 정답 차를 대접해 별조각을 받았을 때
@@ -68,10 +78,6 @@ export const REFLECTION_TEXT = {
   prompt: "오늘 당신의 마음은 어떤가요? 편하게 적은 뒤,\n아래에서 찻잎과 과일을 하나씩 골라 주세요.",
   placeholder: "예) 요즘 걱정이 많아서 밤에 잠이 잘 안 와요.",
   privacy: "적은 이야기는 이 기기 안에서만 읽고, 어디에도 저장하거나 보내지 않아요.",
-  // 아래 재료 칸 위의 [찻잎 | 과일] 탭. 아직 고르지 않았으면 "찻잎 고르기"처럼 보여요
-  leafTab: "찻잎",
-  fruitTab: "과일",
-  emptyPick: "고르기",
   completeButton: "완성하기",
   back: "찻집으로",
   maxLength: 300

@@ -25,6 +25,20 @@ export function decideBlend(ranking, ratio = BLEND_SETTINGS.ratio) {
 
 export const isSameBlend = (a, b) => Boolean(a && b) && a.leafId === b.leafId && a.fruitId === b.fruitId;
 
+/**
+ * 손님에게 내어 드린 차를 정답과 견주어 본다. (찻잎은 찻잎끼리, 과일은 과일끼리)
+ * @returns 'match' 둘 다 맞음 | 'leafOnly' 찻잎만 | 'fruitOnly' 과일만
+ *          | 'swapped' 찻잎과 과일의 자리가 바뀜 | 'none' 둘 다 아쉬움
+ */
+export function tasteBlend(served, answer) {
+  const leafOk = served.leafId === answer.leafId;
+  const fruitOk = served.fruitId === answer.fruitId;
+  if (leafOk && fruitOk) return 'match';
+  if (leafOk) return 'leafOnly';
+  if (fruitOk) return 'fruitOnly';
+  return served.leafId === answer.fruitId && served.fruitId === answer.leafId ? 'swapped' : 'none';
+}
+
 /** { leafId, fruitId } → 찻잎과 과일의 이름·아이콘·빛깔·열매 */
 export function blendParts(blend) {
   const leafOf = ingredientById(blend?.leafId);

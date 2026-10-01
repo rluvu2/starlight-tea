@@ -6,8 +6,9 @@ import GuestImage from '../components/GuestImage.jsx';
 import { ChevronLeftIcon, SparkleIcon, StarIcon } from '../components/icons.jsx';
 import Sheet from '../components/Sheet.jsx';
 import { buildCollection, useGameState } from '../hooks/useGameState.js';
+import { blendName, blendParts } from '../logic/blend.js';
 import { formatDate } from '../logic/format.js';
-import { INGREDIENT_LIST, ingredientById } from '../logic/gameData.js';
+import { INGREDIENT_LIST } from '../logic/gameData.js';
 import { ingredientIconUrl } from '../utils/assets.js';
 import { haptic } from '../utils/haptics.js';
 
@@ -47,8 +48,8 @@ function GuestPortrait({ entry, className }) {
 }
 
 function GuestDetail({ entry, onClose }) {
-  const { guest, status, record, visits } = entry;
-  const ingredient = record ? ingredientById(record.ingredientId) : null;
+  const { guest, status, record, blend, visits } = entry;
+  const parts = blendParts(blend);
   return (
     <Sheet title={status === 'unknown' ? '아직 만나지 못한 손님' : guest.name} onClose={onClose}>
       <div className="relative mx-auto aspect-square w-[62%] overflow-hidden rounded-3xl" style={{ background: cardBackground(status) }}>
@@ -65,17 +66,21 @@ function GuestDetail({ entry, onClose }) {
           <DetailSection label="들려준 이야기">
             <p className="break-keep font-serif text-[15px] leading-[1.8] text-ink-100">“{guest.story}”</p>
           </DetailSection>
-          {status === 'comforted' && ingredient ? (
+          {status === 'comforted' && parts ? (
             <>
               <DetailSection label="마음을 데운 차">
                 <div className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/4 p-3">
-                  <div className="grid h-11 w-11 shrink-0 place-items-center rounded-xl" style={{ backgroundColor: `${ingredient.color}26` }}>
-                    <img src={ingredientIconUrl(ingredient.icon)} alt="" className="h-8 w-8" />
+                  <div
+                    className="relative h-11 w-11 shrink-0 rounded-xl"
+                    style={{ background: `linear-gradient(135deg, ${parts.leaf.color}30, ${parts.fruit.color}30)` }}
+                  >
+                    <img src={ingredientIconUrl(parts.leaf.icon)} alt="" className="absolute left-0.5 top-0.5 h-7 w-7" />
+                    <img src={ingredientIconUrl(parts.fruit.icon)} alt="" className="absolute bottom-0.5 right-0.5 h-6 w-6" />
                   </div>
                   <div>
-                    <p className="font-serif text-[15px] text-ink-100">{ingredient.name}</p>
-                    <p className="text-xs" style={{ color: softText(ingredient.color) }}>
-                      {ingredient.virtue}
+                    <p className="font-serif text-[15px] text-ink-100">{blendName(blend)}</p>
+                    <p className="text-xs" style={{ color: softText(parts.leaf.color) }}>
+                      {parts.pure ? parts.leaf.virtue : `${parts.leaf.virtue} + ${parts.fruit.virtue}`}
                     </p>
                   </div>
                 </div>
@@ -143,7 +148,7 @@ function TeaList({ entries }) {
         <b className="font-normal text-lamp-200">2위 마음은 과일</b>로 블렌딩해요. 찻잎 9 × 과일 9, 모두 81가지 차가 있어요.
       </p>
       {INGREDIENT_LIST.map((ing, index) => {
-        const names = entries.filter((e) => e.record?.ingredientId === ing.id).map((e) => e.guest.name);
+        const names = entries.filter((e) => e.blend && (e.blend.leafId === ing.id || e.blend.fruitId === ing.id)).map((e) => e.guest.name);
         return (
           <m.div
             key={ing.id}
