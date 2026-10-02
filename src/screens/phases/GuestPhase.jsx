@@ -5,7 +5,7 @@ import { playSfx } from '../../audio/engine.js';
 import GuestImage, { probeHappyImage } from '../../components/GuestImage.jsx';
 import { launchMeteors } from '../../components/NightSky.jsx';
 import SparkleBurst from '../../components/SparkleBurst.jsx';
-import { SparkleIcon, StarIcon } from '../../components/icons.jsx';
+import { ReplayIcon, SparkleIcon, StarIcon } from '../../components/icons.jsx';
 import { GlassCup, Steam } from '../../components/teaware.jsx';
 import { GUEST_TEXT, LEVEL_NAMES, OWNER_NAME, PICK_TEXT } from '../../data/scripts.js';
 import { PHASE, useGameState } from '../../hooks/useGameState.js';
@@ -144,12 +144,18 @@ export function GuestCup() {
 /**
  * 손님의 말풍선. hint 가 있으면 말을 다 한 뒤 아래에 팽주의 귀띔을 덧붙인다.
  * (작은 화면에서는 재료 칸 위에 귀띔을 둘 자리가 없어서 말풍선 안에 둔다)
+ * story 를 넘기면(아쉬운 차를 낸 뒤) 오른쪽 위 [사연 보기]로 처음 들려준 사연을 다시 볼 수 있다.
  */
-function SpeechBubble({ line, guestName, level, hint }) {
+function SpeechBubble({ line, guestName, level, hint, story }) {
   const reduceMotion = useReducedMotion();
   const { shown, done } = useTypewriter(line.text, { instant: reduceMotion, speed: 32, skippable: true });
   const nameTag = line.speaker === 'guest' ? guestName : line.speaker === 'owner' ? OWNER_NAME : null;
   const showLevel = line.speaker === 'guest' && Number.isInteger(level);
+  // 새 대사가 나오면 방금 한 말부터 보여 준다
+  const [showStory, setShowStory] = useState(false);
+  useEffect(() => setShowStory(false), [line.text]);
+  const canReplay = Boolean(story) && done;
+  const showingStory = canReplay && showStory;
   return (
     // 타자 중에 누르면 대사를 끝까지 바로 보여 준다
     <div
@@ -159,7 +165,11 @@ function SpeechBubble({ line, guestName, level, hint }) {
       }`}
     >
       {nameTag && (
-        <span className="absolute -top-3 left-4 flex max-w-[80%] items-center gap-1.5 rounded-full bg-lamp-300 px-3 py-0.5 font-serif text-[12.5px] font-bold text-night-900 shadow-md">
+        <span
+          className={`absolute -top-3 left-4 flex items-center gap-1.5 rounded-full bg-lamp-300 px-3 py-0.5 font-serif text-[12.5px] font-bold text-night-900 shadow-md ${
+            canReplay ? 'max-w-[calc(100%-132px)]' : 'max-w-[80%]'
+          }`}
+        >
           <span className="truncate">{nameTag}</span>
           {/* 손님의 난이도: ★ 쉬움 · ★★ 보통 · ★★★ 어려움 */}
           {showLevel && (
@@ -169,13 +179,51 @@ function SpeechBubble({ line, guestName, level, hint }) {
           )}
         </span>
       )}
+      {/* 아쉬운 차를 낸 뒤: 처음 들려준 사연 ↔ 방금 한 말. 작은 단추라 손가락이 닿는 자리는 둘레로 넓혀 둔다 */}
+      {canReplay && (
+        <m.button
+          type="button"
+          aria-pressed={showStory}
+          onClick={(event) => {
+            event.stopPropagation();
+            setShowStory((value) => !value);
+            playSfx('page');
+            haptic('light');
+          }}
+          className="pointer-events-auto absolute -top-3.5 right-3 flex items-center gap-1 rounded-full border border-lamp-300/70 bg-night-900 px-2.5 py-1 text-[12px] font-bold text-lamp-200 shadow-md after:absolute after:-inset-x-2 after:-inset-y-3 after:content-['']"
+          initial={{ opacity: 0, scale: 0.7 }}
+          animate={{ opacity: 1, scale: 1 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ type: 'spring', stiffness: 420, damping: 18 }}
+        >
+          {/* 처음 나타날 때 눈에 띄도록 두 번 반짝 */}
+          {!showStory && (
+            <m.span
+              aria-hidden="true"
+              className="absolute inset-0 rounded-full border-2 border-lamp-300"
+              initial={{ opacity: 0.9, scale: 1 }}
+              animate={{ opacity: 0, scale: 1.5 }}
+              transition={{ duration: 1.1, repeat: 1, ease: 'easeOut' }}
+            />
+          )}
+          <ReplayIcon className="h-3.5 w-3.5" />
+          {showStory ? GUEST_TEXT.reactionButton : GUEST_TEXT.storyButton}
+        </m.button>
+      )}
       <p
         aria-live="polite"
         className={`min-h-[3.2em] whitespace-pre-line break-keep font-serif text-[15px] leading-[1.6] ${
           line.speaker === 'narration' ? 'text-center text-ink-300' : 'text-ink-100'
         }`}
       >
-        {shown}
+        {showingStory ? (
+          <>
+            <span className="mb-0.5 block font-sans text-[11px] tracking-wide text-lamp-300/90">{GUEST_TEXT.storyLabel}</span>
+            {story}
+          </>
+        ) : (
+          shown
+        )}
       </p>
       <AnimatePresence initial={false}>
         {hint && done && (
@@ -281,7 +329,13 @@ export function GuestOverlay() {
   return (
     <m.div className="pointer-events-none absolute inset-0 z-20" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <div className="absolute inset-x-4 top-[min(12cqw,52px)]">
-        <SpeechBubble line={guest.line} guestName={data.name} level={data.level} hint={guest.step === 'missed' ? guest.hint : null} />
+        <SpeechBubble
+          line={guest.line}
+          guestName={data.name}
+          level={data.level}
+          hint={guest.step === 'missed' ? guest.hint : null}
+          story={guest.step === 'missed' ? data.story : null}
+        />
       </div>
       <div
         ref={anchor}

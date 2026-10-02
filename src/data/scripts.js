@@ -41,7 +41,11 @@ export const GUEST_TEXT = {
   continueButton: "계속하기",
   continueHint: "화면을 누르면 다음으로 넘어가요",
   // 귀띔 앞의 꼬리표. {part} 는 아직 못 맞힌 쪽(찻잎 / 과일)
-  hintLabel: "{part} 귀띔"
+  hintLabel: "{part} 귀띔",
+  // 아쉬운 차를 낸 뒤 말풍선 위의 버튼: 처음 들려준 사연을 다시 보기 ↔ 방금 한 말로 돌아가기
+  storyButton: "사연 보기",
+  reactionButton: "방금 한 말",
+  storyLabel: "처음 들려준 이야기"
 };
 
 // 차를 내어 드린 뒤 손님이 마시는 동안의 문장
