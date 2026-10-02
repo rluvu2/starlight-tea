@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 결과를 기다리는 부엉이 (guest_013) -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#B8957A"/><stop offset="1" stop-color="#8C6B50"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A88468"/><stop offset="1" stop-color="#86654C"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 196 520 C 196 432 220 372 256 364 C 292 372 316 432 316 520 Z" fill="#EAD8C0" stroke="#C9AE8A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 230 392 q 8 8 16 0 M 252 404 q 8 8 16 0 M 266 392 q 8 8 16 0" fill="none" stroke="#B89A74" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M 230 420 q 8 8 16 0 M 252 432 q 8 8 16 0 M 266 420 q 8 8 16 0" fill="none" stroke="#B89A74" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M 230 448 q 8 8 16 0 M 252 460 q 8 8 16 0 M 266 448 q 8 8 16 0" fill="none" stroke="#B89A74" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 150 140 L 124 64 L 198 112 Z" fill="#8C6B50" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><g transform="translate(512 0) scale(-1 1)"><path d="M 150 140 L 124 64 L 198 112 Z" fill="#8C6B50" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="222" rx="136" ry="120" fill="url(#headG)" stroke="#5A4030" stroke-width="6"/>
+  <circle cx="203" cy="214" r="52" fill="#F1E2CC" stroke="#C9AE8A" stroke-width="3"/><circle cx="203" cy="214" r="26" fill="#F6C94A" stroke="#C99A2E" stroke-width="3"/><g transform="translate(512 0) scale(-1 1)"><circle cx="203" cy="214" r="52" fill="#F1E2CC" stroke="#C9AE8A" stroke-width="3"/><circle cx="203" cy="214" r="26" fill="#F6C94A" stroke="#C99A2E" stroke-width="3"/></g>
+  <path d="M 242 248 Q 256 236 270 248 L 256 278 Z" fill="#E8A93C" stroke="#A8701E" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 표정 -->
+  <path d="M 183 188 Q 203 184 219 174" fill="none" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 188 Q 309 184 293 174" fill="none" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="203" cy="214" rx="17" ry="17" fill="#FBF7F0" stroke="#3B2619" stroke-width="3"/><circle cx="203" cy="216" r="7.8" fill="#2B1C14"/><circle cx="206" cy="212" r="2.6" fill="#FFFFFF"/><ellipse cx="309" cy="214" rx="17" ry="17" fill="#FBF7F0" stroke="#3B2619" stroke-width="3"/><circle cx="309" cy="216" r="7.8" fill="#2B1C14"/><circle cx="312" cy="212" r="2.6" fill="#FFFFFF"/><ellipse cx="164" cy="280" rx="18" ry="10" fill="#E8968A" opacity="0.45"/><ellipse cx="348" cy="280" rx="18" ry="10" fill="#E8968A" opacity="0.45"/>
+  <g transform="translate(378 136) rotate(28)"><path d="M -6 -60 L 6 -60 L 6 30 L 0 44 L -6 30 Z" fill="#F2C14E" stroke="#8A6420" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M -6 30 L 6 30 L 0 44 Z" fill="#3A3A3A"/></g>
+
+  <!-- 기분 -->
+  <path d="M 112 160 Q 124 176 120 186 A 10 10 0 0 1 102 182 Q 102 174 112 160 Z" fill="#A9DBF3" stroke="#5E9FC2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

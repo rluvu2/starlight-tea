@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 쳇바퀴를 못 멈추는 햄스터 (guest_011) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#F6CF96"/><stop offset="1" stop-color="#E2AB68"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#64B3DE"/><stop offset="1" stop-color="#3E89BA"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#2D6A92" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 196 346 Q 256 390 316 346" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/><path d="M 190 346 L 176 420 M 322 346 L 336 420" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <circle cx="162" cy="128" r="30" fill="#E8B47C" stroke="#9A6A3A" stroke-width="5"/><circle cx="164" cy="130" r="15" fill="#F2A7A7"/><g transform="translate(512 0) scale(-1 1)"><circle cx="162" cy="128" r="30" fill="#E8B47C" stroke="#9A6A3A" stroke-width="5"/><circle cx="164" cy="130" r="15" fill="#F2A7A7"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="220" rx="130" ry="118" fill="url(#headG)" stroke="#9A6A3A" stroke-width="6"/>
+  <ellipse cx="188" cy="278" rx="46" ry="36" fill="#FFF4E4" stroke="#E8CFAE" stroke-width="3"/><g transform="translate(512 0) scale(-1 1)"><ellipse cx="188" cy="278" rx="46" ry="36" fill="#FFF4E4" stroke="#E8CFAE" stroke-width="3"/></g>
+  <path d="M 246 246 L 266 246 L 256 258 Z" fill="#E68A94" stroke="#B85E6E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 196 256 L 144 246 M 196 266 L 142 268 M 198 275 L 150 288" fill="none" stroke="#9A6A3A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><g transform="translate(512 0) scale(-1 1)"><path d="M 196 256 L 144 246 M 196 266 L 142 268 M 198 275 L 150 288" fill="none" stroke="#9A6A3A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/></g>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#9A6A3A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#9A6A3A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 256 256 L 256 266" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 236 268 Q 246 283 256 270 Q 266 283 276 268" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="180" cy="270" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="332" cy="270" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+  <path d="M 132 146 Q 256 110 380 146 L 384 170 Q 256 134 128 170 Z" fill="#E55B4D" stroke="#A83A30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 기분 -->
+  <path d="M 110 105.6 Q 112.7 117.3 124.4 120 Q 112.7 122.7 110 134.4 Q 107.3 122.7 95.6 120 Q 107.3 117.3 110 105.6 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 406 127.2 Q 408.4 137.6 418.8 140 Q 408.4 142.4 406 152.8 Q 403.6 142.4 393.2 140 Q 403.6 137.6 406 127.2 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="392" cy="318" rx="10" ry="18" fill="#3A3A3A" stroke="#222" stroke-width="2" transform="rotate(30 392 318)"/><path d="M 388 304 L 396 330" fill="none" stroke="#EDEDED" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" transform="rotate(30 392 318)"/>
+</svg>

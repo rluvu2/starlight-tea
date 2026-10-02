@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 쳇바퀴를 못 멈추는 햄스터 (guest_011) -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#F6CF96"/><stop offset="1" stop-color="#E2AB68"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#64B3DE"/><stop offset="1" stop-color="#3E89BA"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#2D6A92" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 196 346 Q 256 390 316 346" fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linejoin="round" stroke-linecap="round"/><path d="M 190 346 L 176 420 M 322 346 L 336 420" fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <circle cx="162" cy="128" r="30" fill="#E8B47C" stroke="#9A6A3A" stroke-width="5"/><circle cx="164" cy="130" r="15" fill="#F2A7A7"/><g transform="translate(512 0) scale(-1 1)"><circle cx="162" cy="128" r="30" fill="#E8B47C" stroke="#9A6A3A" stroke-width="5"/><circle cx="164" cy="130" r="15" fill="#F2A7A7"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="220" rx="130" ry="118" fill="url(#headG)" stroke="#9A6A3A" stroke-width="6"/>
+  <ellipse cx="188" cy="278" rx="46" ry="36" fill="#FFF4E4" stroke="#E8CFAE" stroke-width="3"/><g transform="translate(512 0) scale(-1 1)"><ellipse cx="188" cy="278" rx="46" ry="36" fill="#FFF4E4" stroke="#E8CFAE" stroke-width="3"/></g>
+  <path d="M 246 246 L 266 246 L 256 258 Z" fill="#E68A94" stroke="#B85E6E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 196 256 L 144 246 M 196 266 L 142 268 M 198 275 L 150 288" fill="none" stroke="#9A6A3A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><g transform="translate(512 0) scale(-1 1)"><path d="M 196 256 L 144 246 M 196 266 L 142 268 M 198 275 L 150 288" fill="none" stroke="#9A6A3A" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/></g>
+
+  <!-- 표정 -->
+  <path d="M 183 188 Q 203 184 219 174" fill="none" stroke="#9A6A3A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 188 Q 309 184 293 174" fill="none" stroke="#9A6A3A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 210 A 17 15 0 0 0 220 210 Z" fill="#2B1C14"/><circle cx="208" cy="215" r="3.4" fill="#FFFFFF"/><path d="M 182 209 Q 203 203 224 210" fill="none" stroke="#3B2619" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 210 A 17 15 0 0 0 326 210 Z" fill="#2B1C14"/><circle cx="314" cy="215" r="3.4" fill="#FFFFFF"/><path d="M 288 209 Q 309 203 330 210" fill="none" stroke="#3B2619" stroke-width="5.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 256 256 L 256 266" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 238 277 Q 247 271 256 276 Q 265 281 274 275" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="180" cy="270" rx="18" ry="10" fill="#E8968A" opacity="0.45"/><ellipse cx="332" cy="270" rx="18" ry="10" fill="#E8968A" opacity="0.45"/>
+  <path d="M 132 146 Q 256 110 380 146 L 384 170 Q 256 134 128 170 Z" fill="#E55B4D" stroke="#A83A30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 기분 -->
+  <path d="M 392 176 Q 404 192 400 202 A 10 10 0 0 1 382 198 Q 382 190 392 176 Z" fill="#A9DBF3" stroke="#5E9FC2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M 110 200 Q 119 212 116 219.5 A 7.5 7.5 0 0 1 102.5 216.5 Q 102.5 210.5 110 200 Z" fill="#A9DBF3" stroke="#5E9FC2" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M 420 290 l 30 0 M 426 310 l 22 0 M 420 330 l 30 0" fill="none" stroke="#9AB8E0" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

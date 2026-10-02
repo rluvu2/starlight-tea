@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 고맙단 말을 못 들은 원숭이 (guest_022) -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#AD7A52"/><stop offset="1" stop-color="#835430"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F6CF66"/><stop offset="1" stop-color="#E0AE3C"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#9A7420" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 184 346 Q 256 398 328 346 L 316 338 Q 256 382 196 338 Z" fill="#FFF0C8" stroke="#9A7420" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <circle cx="134" cy="228" r="40" fill="#9B6A45" stroke="#553420" stroke-width="6"/><circle cx="136" cy="230" r="23" fill="#F2C9A8"/><g transform="translate(512 0) scale(-1 1)"><circle cx="134" cy="228" r="40" fill="#9B6A45" stroke="#553420" stroke-width="6"/><circle cx="136" cy="230" r="23" fill="#F2C9A8"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="222" rx="122" ry="116" fill="url(#headG)" stroke="#553420" stroke-width="6"/>
+  <path d="M 256 168 C 230 140 160 150 158 210 C 156 250 176 270 190 282 C 200 320 230 332 256 332 C 282 332 312 320 322 282 C 336 270 356 250 354 210 C 352 150 282 140 256 168 Z" fill="#F4D2B0" stroke="#C99E78" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="248" cy="256" r="4" fill="#553420"/><circle cx="264" cy="256" r="4" fill="#553420"/>
+
+  <!-- 표정 -->
+  <path d="M 185 182 Q 203 179 221 182" fill="none" stroke="#553420" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 327 182 Q 309 179 291 182" fill="none" stroke="#553420" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="210" cy="216" rx="12.88" ry="14.72" fill="#2B1C14"/><circle cx="213.68" cy="211.4" r="4.232" fill="#FFFFFF"/><circle cx="206.32" cy="221.52" r="1.84" fill="#FFFFFF"/><ellipse cx="316" cy="216" rx="12.88" ry="14.72" fill="#2B1C14"/><circle cx="319.68" cy="211.4" r="4.232" fill="#FFFFFF"/><circle cx="312.32" cy="221.52" r="1.84" fill="#FFFFFF"/><path d="M 256 264 L 256 274" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 243 284 L 269 284" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="168" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.45"/><ellipse cx="344" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.45"/>
+  <g transform="translate(380 372) rotate(8)"><path d="M -34 -42 L 34 -42 L 34 42 L -34 42 Z" fill="#7FB3E0" stroke="#3E6E9A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="-34" cy="-24" r="4" fill="#FFFFFF" stroke="#3E6E9A" stroke-width="2"/><circle cx="-34" cy="-8" r="4" fill="#FFFFFF" stroke="#3E6E9A" stroke-width="2"/><circle cx="-34" cy="8" r="4" fill="#FFFFFF" stroke="#3E6E9A" stroke-width="2"/><circle cx="-34" cy="24" r="4" fill="#FFFFFF" stroke="#3E6E9A" stroke-width="2"/><path d="M -16 -14 L 22 -14 M -16 2 L 22 2 M -16 18 L 12 18" fill="none" stroke="#DCEBF7" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></g>
+
+  <!-- 기분 -->
+  <path d="M 232 94 L 232 120" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/><path d="M 246 94 L 246 120" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/><path d="M 260 94 L 260 120" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/><path d="M 274 94 L 274 120" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/>
+</svg>

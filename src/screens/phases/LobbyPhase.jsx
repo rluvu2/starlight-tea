@@ -10,9 +10,9 @@ import { Steam } from '../../components/teaware.jsx';
 import { LEVEL_NAMES, LOBBY_TEXT } from '../../data/scripts.js';
 import { buildCollection, useGameState } from '../../hooks/useGameState.js';
 import { levelName, levelStars } from '../../logic/format.js';
-import { GUEST_LIST } from '../../logic/gameData.js';
+import { GUEST_LIST, OPENING_LIST } from '../../logic/gameData.js';
 import { fill } from '../../logic/josa.js';
-import { frontierLevel } from '../../logic/pickGuest.js';
+import { visitStage } from '../../logic/pickGuest.js';
 
 /** 한 단계의 손님을 모두 위로했을 때 로비에서 한 번 보여 주는 소식 */
 function milestoneText(milestone, hasGuests) {
@@ -20,6 +20,7 @@ function milestoneText(milestone, hasGuests) {
     const level = levelName(milestone.level, LEVEL_NAMES);
     return { title: LOBBY_TEXT.levelUpTitle, subtitle: fill(LOBBY_TEXT.levelUpSubtitle, { level }), badge: `${levelStars(milestone.level)} ${level}` };
   }
+  if (milestone?.kind === 'open') return { title: LOBBY_TEXT.openTitle, subtitle: LOBBY_TEXT.openSubtitle, badge: LOBBY_TEXT.openBadge };
   if (milestone?.kind === 'complete') return { title: LOBBY_TEXT.completeTitle, subtitle: LOBBY_TEXT.completeSubtitle, badge: '★★★' };
   return { title: LOBBY_TEXT.title, subtitle: hasGuests ? LOBBY_TEXT.subtitle : LOBBY_TEXT.noGuests, badge: null };
 }
@@ -117,12 +118,14 @@ export function LobbyMenu({ onOpenCollection }) {
   const entries = buildCollection(state.save);
   const comforted = entries.filter((entry) => entry.status === 'comforted').length;
   const hasGuests = GUEST_LIST.length > 0;
-  // 다음에 찾아올 새 손님의 단계 (모두 데웠으면 다시 들르는 손님)
-  const nextLevel = frontierLevel(GUEST_LIST, state.save.collection);
+  // 다음에 찾아올 손님: 처음 순서면 그 단계, 그 뒤로는 무작위(남은 손님 수), 모두 데웠으면 다시 들르는 손님
+  const stage = visitStage(GUEST_LIST, state.save.collection, OPENING_LIST);
   const nextCaption =
-    nextLevel === null
-      ? LOBBY_TEXT.revisitCaption
-      : fill(LOBBY_TEXT.nextGuestCaption, { stars: levelStars(nextLevel), level: levelName(nextLevel, LEVEL_NAMES) });
+    stage.kind === 'opening'
+      ? fill(LOBBY_TEXT.nextGuestCaption, { stars: levelStars(stage.level), level: levelName(stage.level, LEVEL_NAMES) })
+      : stage.kind === 'free'
+        ? fill(LOBBY_TEXT.freeCaption, { count: stage.left })
+        : LOBBY_TEXT.revisitCaption;
 
   return (
     <m.nav

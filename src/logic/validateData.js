@@ -20,7 +20,12 @@ export const INGREDIENT_COUNT = 9; // 3×3 칸, 9 × 9 = 81가지 블렌딩
 export const RECOMMENDED_TRAIN_SENTENCES = 50; // 속성마다 권장하는 학습 문장 수
 export const DEFAULT_GUEST_LEVEL = 3; // level 이 비어 있는 손님은 가장 나중에 (어려움)
 
-export function validateGameData({ guests, ingredients, missDialogues }) {
+export const DEFAULT_OPENING_VISITS = [
+  { level: 1, count: 2 },
+  { level: 2, count: 2 },
+];
+
+export function validateGameData({ guests, ingredients, missDialogues, openingVisits = DEFAULT_OPENING_VISITS }) {
   const errors = [];
   const warnings = [];
 
@@ -132,7 +137,25 @@ export function validateGameData({ guests, ingredients, missDialogues }) {
 
   if (validGuests.length === 0) warnings.push('게임에 등장할 수 있는 손님이 한 명도 없어요.');
 
-  return { guests: validGuests, ingredients: validIngredients, missDialogues: dialogues, errors, warnings };
+  // ── 처음 순서 (OPENING_VISITS): [{ level, count }] ──
+  const opening = [];
+  if (!Array.isArray(openingVisits)) {
+    warnings.push('guests.js › OPENING_VISITS 는 [{ level: 1, count: 2 }, …] 배열이어야 해요. 기본 순서(쉬움 2 → 보통 2)를 써요.');
+  }
+  (Array.isArray(openingVisits) ? openingVisits : DEFAULT_OPENING_VISITS).forEach((step, index) => {
+    const ok = Number.isInteger(step?.level) && step.level >= 1 && Number.isInteger(step?.count) && step.count >= 1;
+    if (!ok) {
+      warnings.push(`guests.js › OPENING_VISITS[${index}]: { level: 숫자, count: 1 이상 } 형태여야 해서 건너뛰어요. 지금 값: ${JSON.stringify(step)}`);
+      return;
+    }
+    const available = validGuests.filter((guest) => guest.level === step.level).length;
+    if (available < step.count) {
+      warnings.push(`guests.js › OPENING_VISITS[${index}]: ${step.level}단계 손님이 ${available}명이라 처음 ${step.count}명을 채울 수 없어요.`);
+    }
+    opening.push({ level: step.level, count: step.count });
+  });
+
+  return { guests: validGuests, ingredients: validIngredients, missDialogues: dialogues, opening, errors, warnings };
 }
 
 /**

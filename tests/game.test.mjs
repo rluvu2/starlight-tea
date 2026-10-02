@@ -4,11 +4,11 @@ import assert from 'node:assert/strict';
 const root = new URL('../src/', import.meta.url).href;
 const gs = await import(root + 'hooks/useGameState.js');
 const { PHASE, gameReducer: reduce, createInitialState, createDefaultSave, mergeSave, migrateLegacySave, loadSave, writeSave, buildCollection, SAVE_KEY, LEGACY_SAVE_KEY } = gs;
-const { GUEST_LIST, guestById, ingredientById } = await import(root + 'logic/gameData.js');
+const { GUEST_LIST, guestById, ingredientById, OPENING_LIST } = await import(root + 'logic/gameData.js');
 const { analyzeWorry } = await import(root + 'logic/advisor.js');
 const { decideBlend, blendName, blendLine, blendParts, isSameBlend, mixHex, tasteBlend } = await import(root + 'logic/blend.js');
 const { fill } = await import(root + 'logic/josa.js');
-const { pickNextGuest } = await import(root + 'logic/pickGuest.js');
+const { pickNextGuest, stageMilestone, visitStage } = await import(root + 'logic/pickGuest.js');
 
 // 손님에게 찻잎과 과일을 골라 내어 드리고, 다 마실 때까지 기다린다
 const serve = (state, leafId, fruitId, extra = {}) => {
@@ -137,33 +137,65 @@ flip = reduce(flip, { type: 'SELECT', ingredientId: 8, mode: 'leaf' });
 assert.deepEqual([flip.guest.leafId, flip.guest.fruitId], [8, null], '과일 탭으로 넘어가기 전에 누른 찻잎은 찻잎으로');
 assert.equal(reduce(flip, { type: 'SELECT', ingredientId: 1, mode: 'stem' }).guest.fruitId, 1, '모르는 탭이면 지금 탭으로');
 
-// 난이도와 방문 순서: 아직 마음을 데우지 못한 손님 중 가장 쉬운 단계부터
+// 난이도와 방문 순서: 쉬움 2명 → 보통 2명(처음 순서) → 그 뒤로는 아직 못 데운 손님 중 무작위
 const levels = GUEST_LIST.map((g) => g.level);
+assert.equal(GUEST_LIST.length, 30, '손님 30명');
 assert.deepEqual(levels, [...levels].sort(), '도감 번호도 쉬운 손님부터');
-assert.deepEqual([1, 2, 3].map((level) => levels.filter((l) => l === level).length >= 2), [true, true, true], '단계마다 손님이 둘 이상');
+assert.deepEqual([1, 2, 3].map((level) => levels.filter((l) => l === level).length), [10, 10, 10], '쉬움 10 · 보통 10 · 어려움 10');
+assert.deepEqual(OPENING_LIST, [{ level: 1, count: 2 }, { level: 2, count: 2 }], '처음 순서: 쉬움 2명 → 보통 2명');
 for (const g of GUEST_LIST.filter((g) => g.level === 1)) {
-  assert.ok(g.story.includes(ingredientById(g.required_leaf).name) && g.story.includes(ingredientById(g.required_fruit).fruit.name), `${g.name}: 쉬움은 정답 이름이 사연에 보인다`);
+  assert.ok(g.story.includes(ingredientById(g.required_leaf).name) && g.story.includes(ingredientById(g.required_fruit).fruit.name), g.name + ': 쉬움은 정답 이름이 사연에 보인다');
 }
 for (const g of GUEST_LIST.filter((g) => g.level === 2)) {
   const words = [g.required_leaf, g.required_fruit].map((id) => ingredientById(id).virtue.slice(0, 2));
-  assert.ok(words.every((w) => g.story.includes(w)), `${g.name}: 보통은 열매 이름이 사연에 보인다 (${words})`);
+  assert.ok(words.every((w) => g.story.includes(w)), g.name + ': 보통은 열매 이름이 사연에 보인다 (' + words + ')');
+  if (words[0] !== words[1]) assert.ok(g.story.indexOf(words[0]) < g.story.indexOf(words[1]), g.name + ': 보통은 먼저 나온 열매가 찻잎');
+}
+for (const g of GUEST_LIST.filter((g) => g.level === 3)) {
+  const names = [ingredientById(g.required_leaf), ingredientById(g.required_fruit)].flatMap((ing) => [ing.name, ing.fruit.name, ing.virtue.slice(0, 2)]);
+  assert.ok(names.every((n) => !g.story.includes(n)), g.name + ': 어려움은 정답 이름이 사연에 나오지 않는다');
+}
+// 아홉 열매가 찻잎으로도, 과일로도 고르게 쓰인다 (각각 3~4번)
+for (const part of ['required_leaf', 'required_fruit']) {
+  const counts = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((id) => GUEST_LIST.filter((g) => g[part] === id).length);
+  assert.ok(counts.every((c) => c >= 3 && c <= 4), part + ' 분포 ' + counts);
 }
 const comforted = (...ids) => ({ collection: Object.fromEntries(ids.map((id) => [id, { count: 1 }])) });
 const idsAt = (level) => GUEST_LIST.filter((g) => g.level === level).map((g) => g.id);
-const levelOf = (progress, roll) => pickNextGuest(GUEST_LIST, progress, () => roll).level;
+const next = (progress, roll) => pickNextGuest(GUEST_LIST, progress, () => roll, OPENING_LIST);
+const levelOf = (progress, roll) => next(progress, roll).level;
 for (const roll of [0, 0.5, 0.99]) assert.equal(levelOf({}, roll), 1, '처음엔 언제나 쉬운 손님');
-assert.notEqual(pickNextGuest(GUEST_LIST, {}, () => 0).id, pickNextGuest(GUEST_LIST, {}, () => 0.99).id, '같은 단계끼리는 무작위');
-assert.equal(levelOf(comforted(idsAt(1)[0]), 0.99), 1, '쉬운 손님을 다 데우기 전에는 쉬운 손님');
-for (const roll of [0, 0.99]) assert.equal(levelOf(comforted(...idsAt(1)), roll), 2, '쉬움 다음은 보통');
-for (const roll of [0, 0.99]) assert.equal(levelOf(comforted(...idsAt(1), ...idsAt(2)), roll), 3, '그다음 어려움');
+assert.notEqual(next({}, 0).id, next({}, 0.99).id, '같은 단계끼리는 무작위');
+assert.equal(levelOf(comforted(idsAt(1)[0]), 0.99), 1, '쉬운 손님 2명을 데우기 전에는 쉬운 손님');
+for (const roll of [0, 0.99]) assert.equal(levelOf(comforted(...idsAt(1).slice(0, 2)), roll), 2, '쉬움 2명 다음은 보통');
+assert.equal(levelOf(comforted(...idsAt(1).slice(0, 2), idsAt(2)[0]), 0.99), 2, '보통 2명을 데우기 전에는 보통');
+const opened = comforted(...idsAt(1).slice(0, 2), ...idsAt(2).slice(0, 2));
+const seen = new Set([0, 0.2, 0.4, 0.6, 0.8, 0.99].map((roll) => levelOf(opened, roll)));
+assert.deepEqual([...seen].sort(), [1, 2, 3], '처음 순서 뒤로는 쉬움·보통·어려움이 섞여 온다');
+for (const roll of [0, 0.5, 0.99]) assert.ok(!opened.collection[next(opened, roll).id], '아직 못 데운 손님 중에서만');
 assert.equal(levelOf(comforted(...idsAt(3)), 0.5), 1, '어려운 손님만 데웠던 옛 기록도 쉬운 손님부터');
+const oldSix = comforted('guest_001', 'guest_002', 'guest_003', 'guest_004', 'guest_005', 'guest_006');
+for (const roll of [0, 0.5, 0.99]) assert.ok(Number(next(oldSix, roll).id.slice(6)) >= 7, '어제까지의 6명을 데운 플레이어는 새 손님 24명 중 무작위');
 const [firstEasy, secondEasy] = idsAt(1);
-assert.equal(pickNextGuest(GUEST_LIST, { ...comforted(secondEasy), lastGuestId: firstEasy }).id, firstEasy, '아직 못 데운 손님은 연달아 와도 된다');
+assert.equal(pickNextGuest(GUEST_LIST, { ...comforted(secondEasy), lastGuestId: firstEasy }, () => 0, OPENING_LIST).id, firstEasy, '아직 못 데운 손님은 연달아 와도 된다');
 const all = { ...comforted(...GUEST_LIST.map((g) => g.id)), lastGuestId: firstEasy };
-for (const roll of [0, 0.5, 0.99]) assert.notEqual(pickNextGuest(GUEST_LIST, all, () => roll).id, firstEasy, '모두 데운 뒤에는 직전 손님만 빼고');
+for (const roll of [0, 0.5, 0.99]) assert.notEqual(next(all, roll).id, firstEasy, '모두 데운 뒤에는 직전 손님만 빼고');
 const twins = [{ id: 'a', level: 1 }, { id: 'b', level: 1 }, { id: 'c', level: 2 }];
-assert.equal(pickNextGuest(twins, {}, () => 0).id, 'a'); assert.equal(pickNextGuest(twins, {}, () => 0.99).id, 'b', '같은 단계끼리는 무작위');
+const twinOpening = [{ level: 1, count: 2 }];
+assert.equal(pickNextGuest(twins, {}, () => 0, twinOpening).id, 'a'); assert.equal(pickNextGuest(twins, {}, () => 0.99, twinOpening).id, 'b', '같은 단계끼리는 무작위');
+assert.equal(pickNextGuest(twins, comforted('a'), () => 0, [{ level: 1, count: 5 }]).id, 'b', '그 단계 손님이 모자라면 있는 만큼만');
+assert.equal(pickNextGuest(twins, comforted('a', 'b'), () => 0, [{ level: 1, count: 5 }]).id, 'c');
 assert.equal(pickNextGuest([], {}), null);
+// 방문 단계와 소식
+assert.deepEqual(visitStage(GUEST_LIST, {}, OPENING_LIST), { kind: 'opening', level: 1 });
+assert.deepEqual(visitStage(GUEST_LIST, opened.collection, OPENING_LIST), { kind: 'free', left: 26 });
+assert.deepEqual(visitStage(GUEST_LIST, all.collection, OPENING_LIST), { kind: 'complete' });
+assert.deepEqual(stageMilestone({ kind: 'opening', level: 1 }, { kind: 'opening', level: 2 }), { kind: 'levelUp', level: 2 });
+assert.equal(stageMilestone({ kind: 'opening', level: 1 }, { kind: 'opening', level: 1 }), null);
+assert.deepEqual(stageMilestone({ kind: 'opening', level: 2 }, { kind: 'free', left: 26 }), { kind: 'open' });
+assert.equal(stageMilestone({ kind: 'free', left: 26 }, { kind: 'free', left: 25 }), null);
+assert.deepEqual(stageMilestone({ kind: 'free', left: 1 }, { kind: 'complete' }), { kind: 'complete' });
+assert.equal(stageMilestone({ kind: 'complete' }, { kind: 'complete' }), null);
 // 처음 만난 손님에게 첫 잔으로 맞히면 별조각 하나 더, 한 단계를 다 데우면 로비에서 소식
 const withComforted = (ids) => ({
   ...createInitialState({ ...createDefaultSave(), collection: Object.fromEntries(ids.map((id) => [id, { firstAt: 1, count: 1, leafId: null, fruitId: null }])) }),
@@ -183,10 +215,11 @@ tier = reduce(tier, { type: 'TO_CROSSROADS' });
 assert.deepEqual(tier.milestone, { kind: 'levelUp', level: 2 }, '로비에서 보여 준다');
 assert.equal(reduce(tier, { type: 'START_GUEST', guestId: 'guest_003' }).milestone, null, '로비를 떠나면 지운다');
 assert.equal(reduce(tier, { type: 'START_REFLECTION' }).milestone, null);
+assert.deepEqual(serve(visit(['guest_002', 'guest_004', 'guest_003'], 'guest_005'), 9, 4).milestone, { kind: 'open' }, '보통 2명까지 데우면 모든 단계가 섞여 온다는 소식');
 const allButRabbit = GUEST_LIST.map((g) => g.id).filter((id) => id !== 'guest_006');
 assert.deepEqual(serve(visit(allButRabbit, 'guest_006'), 6, 2).milestone, { kind: 'complete' }, '마지막 손님이면 모두 데웠다는 소식');
 assert.equal(serve(visit(GUEST_LIST.map((g) => g.id), 'guest_006'), 6, 2).milestone, null, '다시 들른 손님은 소식 없음');
-console.log('✓ 손님: 찻잎+과일 내기, 맞힌 쪽 고정·알려 주기, 자리 바뀜, 귀띔(못 맞힌 쪽), 난이도 순서(쉬움→보통→어려움), 한 번에 보너스, 단계 소식');
+console.log('✓ 손님: 찻잎+과일 내기, 맞힌 쪽 고정·알려 주기, 자리 바뀜, 귀띔(못 맞힌 쪽), 처음 순서(쉬움 2→보통 2) 뒤 무작위, 30명 분포, 한 번에 보너스, 단계 소식');
 
 // ── 1-b. 블렌딩 규칙 (2위가 1위의 20% 이상일 때만 과일로) ──
 const r = (pairs) => pairs.map(([label, share]) => ({ label, share }));

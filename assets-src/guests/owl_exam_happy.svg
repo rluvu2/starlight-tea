@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 결과를 기다리는 부엉이 (guest_013) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#B8957A"/><stop offset="1" stop-color="#8C6B50"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A88468"/><stop offset="1" stop-color="#86654C"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 196 520 C 196 432 220 372 256 364 C 292 372 316 432 316 520 Z" fill="#EAD8C0" stroke="#C9AE8A" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 230 392 q 8 8 16 0 M 252 404 q 8 8 16 0 M 266 392 q 8 8 16 0" fill="none" stroke="#B89A74" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M 230 420 q 8 8 16 0 M 252 432 q 8 8 16 0 M 266 420 q 8 8 16 0" fill="none" stroke="#B89A74" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M 230 448 q 8 8 16 0 M 252 460 q 8 8 16 0 M 266 448 q 8 8 16 0" fill="none" stroke="#B89A74" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 150 140 L 124 64 L 198 112 Z" fill="#8C6B50" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><g transform="translate(512 0) scale(-1 1)"><path d="M 150 140 L 124 64 L 198 112 Z" fill="#8C6B50" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="222" rx="136" ry="120" fill="url(#headG)" stroke="#5A4030" stroke-width="6"/>
+  <circle cx="203" cy="214" r="52" fill="#F1E2CC" stroke="#C9AE8A" stroke-width="3"/><g transform="translate(512 0) scale(-1 1)"><circle cx="203" cy="214" r="52" fill="#F1E2CC" stroke="#C9AE8A" stroke-width="3"/></g>
+  <path d="M 242 248 Q 256 236 270 248 L 256 278 Z" fill="#E8A93C" stroke="#A8701E" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="164" cy="280" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="348" cy="280" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+  <g transform="translate(378 136) rotate(28)"><path d="M -6 -60 L 6 -60 L 6 30 L 0 44 L -6 30 Z" fill="#F2C14E" stroke="#8A6420" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><path d="M -6 30 L 6 30 L 0 44 Z" fill="#3A3A3A"/></g>
+
+  <!-- 기분 -->
+  <path d="M 110 104 Q 113 117 126 120 Q 113 123 110 136 Q 107 123 94 120 Q 107 117 110 104 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 404 137.2 Q 406.4 147.6 416.8 150 Q 406.4 152.4 404 162.8 Q 401.6 152.4 391.2 150 Q 401.6 147.6 404 137.2 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 392 290.4 Q 393.8 298.2 401.6 300 Q 393.8 301.8 392 309.6 Q 390.2 301.8 382.4 300 Q 390.2 298.2 392 290.4 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 116.0 286.0 L 119.7 294.9 L 129.3 295.7 L 122.0 301.9 L 124.2 311.3 L 116.0 306.3 L 107.8 311.3 L 110.0 301.9 L 102.7 295.7 L 112.3 294.9 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

@@ -80,13 +80,19 @@ export const LOBBY_TEXT = {
   tonightGuests: "오늘 맞이한 손님 {count}명",
   tonightTeas: "나를 위한 차 {count}잔",
   nextGuest: "다음 손님 맞이하기",
-  // 아직 마음을 데우지 못한 손님이 있을 때. {stars} 는 ★, {level} 은 난이도 이름
+  // 처음 순서(쉬움 2명 → 보통 2명) 동안. {stars} 는 ★, {level} 은 난이도 이름
   nextGuestCaption: "{stars} {level} 단계의 손님이 별빛을 따라와요",
+  // 처음 순서를 마친 뒤 (남은 손님 중 무작위). {count} 는 아직 마음을 데우지 못한 손님 수
+  freeCaption: "어떤 손님이 올지 몰라요 · 아직 못 만난 손님 {count}명",
   // 모든 손님의 마음을 데운 뒤
   revisitCaption: "반가운 손님이 다시 들를지도 몰라요",
   // 한 단계의 손님을 모두 위로해 다음 단계가 열렸을 때 (로비에서 한 번)
   levelUpTitle: "별빛이 조금 더 깊어졌어요.",
   levelUpSubtitle: "이제 '{level}' 단계의 손님들이 찾아와요. 조금 더 깊은 고민을 품고 있대요.",
+  // 처음 순서를 마쳐 모든 단계의 손님이 섞여 찾아오기 시작할 때 (로비에서 한 번)
+  openTitle: "찻집의 문이 활짝 열렸어요.",
+  openSubtitle: "이제 쉬움·보통·어려움 손님이 섞여서 찾아와요. 어떤 고민을 품고 올지는 아무도 몰라요.",
+  openBadge: "★ · ★★ · ★★★",
   // 모든 손님의 마음을 데웠을 때 (로비에서 한 번)
   completeTitle: "모든 손님의 마음을 데웠어요.",
   completeSubtitle: "오늘 밤 찻집은 별빛으로 가득해요. 반가운 얼굴들이 가끔 다시 들를 거예요.",

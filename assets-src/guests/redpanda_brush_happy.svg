@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 붓을 놓은 레서판다 (guest_028) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#E5834F"/><stop offset="1" stop-color="#C2582E"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F1E9DA"/><stop offset="1" stop-color="#D8CCB8"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#8A7A62" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 256 352 L 226 338 Q 218 352 226 366 Z M 256 352 L 286 338 Q 294 352 286 366 Z" fill="#D9534F" stroke="#8A3A30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="256" cy="352" r="7" fill="#D9534F" stroke="#8A3A30" stroke-width="4"/><circle cx="160" cy="430" r="9" fill="#4E9BD6" opacity="0.85"/><circle cx="346" cy="410" r="9" fill="#F2C14E" opacity="0.85"/><circle cx="300" cy="470" r="9" fill="#7FBF6A" opacity="0.85"/><circle cx="196" cy="470" r="9" fill="#E2584E" opacity="0.85"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 156 156 Q 140 78 210 98 Q 200 130 156 156 Z" fill="#8A3A20" stroke="#6A2A18" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 162 144 Q 154 98 196 108 Q 190 128 162 144 Z" fill="#FFF3E6"/><g transform="translate(512 0) scale(-1 1)"><path d="M 156 156 Q 140 78 210 98 Q 200 130 156 156 Z" fill="#8A3A20" stroke="#6A2A18" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 162 144 Q 154 98 196 108 Q 190 128 162 144 Z" fill="#FFF3E6"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="224" rx="128" ry="114" fill="url(#headG)" stroke="#6A2A18" stroke-width="6"/>
+  <ellipse cx="203" cy="178" rx="22" ry="12" fill="#FFF6EC"/><path d="M 150 232 Q 168 302 236 302 Q 222 270 198 260 Q 170 254 150 232 Z" fill="#FFF6EC"/><path d="M 203 238 L 196 268" fill="none" stroke="#8A3A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><g transform="translate(512 0) scale(-1 1)"><ellipse cx="203" cy="178" rx="22" ry="12" fill="#FFF6EC"/><path d="M 150 232 Q 168 302 236 302 Q 222 270 198 260 Q 170 254 150 232 Z" fill="#FFF6EC"/><path d="M 203 238 L 196 268" fill="none" stroke="#8A3A20" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <ellipse cx="256" cy="272" rx="44" ry="32" fill="#FFF6EC" stroke="#E2C8A8" stroke-width="3"/><ellipse cx="256" cy="256" rx="14" ry="9" fill="#2B1C14"/>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#6A2A18" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#6A2A18" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 256 262 L 256 272" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 236 274 Q 246 289 256 276 Q 266 289 276 274" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="168" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="344" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+  <g transform="translate(120 360) rotate(-24)"><path d="M 0 0 L 0 90" fill="none" stroke="#9A6A3A" stroke-width="9" stroke-linejoin="round" stroke-linecap="round"/><path d="M -8 -2 L 8 -2 L 6 -26 Q 0 -40 -6 -26 Z" fill="#E2584E" stroke="#3A2A20" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <path d="M 158 128 Q 170 66 262 62 Q 356 64 366 116 Q 330 140 250 138 Q 190 138 158 128 Z" fill="#3E4A7A" stroke="#252E52" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 266 62 L 272 44" fill="none" stroke="#252E52" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 기분 -->
+  <path d="M 410 115.6 Q 412.7 127.3 424.4 130 Q 412.7 132.7 410 144.4 Q 407.3 132.7 395.6 130 Q 407.3 127.3 410 115.6 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 416 288.8 Q 418.1 297.9 427.2 300 Q 418.1 302.1 416 311.2 Q 413.9 302.1 404.8 300 Q 413.9 297.9 416 288.8 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="386" cy="220" r="7" fill="#4E9BD6"/><circle cx="410" cy="250" r="6" fill="#F2C14E"/><circle cx="380" cy="262" r="5" fill="#7FBF6A"/>
+</svg>

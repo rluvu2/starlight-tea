@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 혼자 잠드는 아기 생쥐 (guest_014) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#D6CFD4"/><stop offset="1" stop-color="#ADA4AB"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BCD6F0"/><stop offset="1" stop-color="#9BBCE0"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#5E80A8" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 206 346 Q 228 400 256 418 Q 284 400 306 346" fill="none" stroke="#5E80A8" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><circle cx="256" cy="440" r="6" fill="#5E80A8"/><circle cx="256" cy="470" r="6" fill="#5E80A8"/><path d="M 150.0 411.0 L 152.4 416.7 L 158.6 417.2 L 153.9 421.3 L 155.3 427.3 L 150.0 424.1 L 144.7 427.3 L 146.1 421.3 L 141.4 417.2 L 147.6 416.7 Z" fill="#FFF3C4"/><path d="M 368.0 396.0 L 370.1 401.1 L 375.6 401.5 L 371.4 405.1 L 372.7 410.5 L 368.0 407.6 L 363.3 410.5 L 364.6 405.1 L 360.4 401.5 L 365.9 401.1 Z" fill="#FFF3C4"/><path d="M 330.0 463.0 L 331.9 467.5 L 336.7 467.8 L 333.0 471.0 L 334.1 475.7 L 330.0 473.1 L 325.9 475.7 L 327.0 471.0 L 323.3 467.8 L 328.1 467.5 Z" fill="#FFF3C4"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <circle cx="150" cy="132" r="54" fill="#C5BCC2" stroke="#6E6670" stroke-width="6"/><circle cx="152" cy="134" r="34" fill="#F2B8C0"/><g transform="translate(512 0) scale(-1 1)"><circle cx="150" cy="132" r="54" fill="#C5BCC2" stroke="#6E6670" stroke-width="6"/><circle cx="152" cy="134" r="34" fill="#F2B8C0"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="224" rx="124" ry="112" fill="url(#headG)" stroke="#6E6670" stroke-width="6"/>
+  <circle cx="256" cy="252" r="11" fill="#E68A9A" stroke="#B85E6E" stroke-width="2"/><path d="M 196 260 L 144 250 M 196 270 L 142 272 M 198 279 L 150 292" fill="none" stroke="#7E7680" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/><g transform="translate(512 0) scale(-1 1)"><path d="M 196 260 L 144 250 M 196 270 L 142 272 M 198 279 L 150 292" fill="none" stroke="#7E7680" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" opacity="0.7"/></g>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#6E6670" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#6E6670" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 256 262 L 256 272" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 236 274 Q 246 289 256 276 Q 266 289 276 274" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="172" cy="268" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="340" cy="268" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+  <path d="M 150 136 Q 190 54 300 70 Q 400 90 428 196 Q 402 150 352 128 Q 260 104 150 136 Z" fill="#7FA6D9" stroke="#4C72A8" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 140 140 Q 256 98 372 138 L 366 160 Q 256 124 146 162 Z" fill="#FFFFFF" stroke="#4C72A8" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="430" cy="204" r="18" fill="#FFFFFF" stroke="#4C72A8" stroke-width="4"/>
+
+  <!-- 기분 -->
+  <path d="M 100 197.2 Q 102.4 207.6 112.8 210 Q 102.4 212.4 100 222.8 Q 97.6 212.4 87.2 210 Q 97.6 207.6 100 197.2 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 410 288.8 Q 412.1 297.9 421.2 300 Q 412.1 302.1 410 311.2 Q 407.9 302.1 398.8 300 Q 407.9 297.9 410 288.8 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 102 309.6 C 84.4 298.4 90.8 284 102 293.6 C 113.2 284 119.6 298.4 102 309.6 Z" fill="#F27A8A" stroke="#C24B5E" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

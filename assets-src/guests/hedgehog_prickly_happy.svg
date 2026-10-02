@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 가시가 많은 고슴도치 (guest_009) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#F1DDBE"/><stop offset="1" stop-color="#DCC09A"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A8CFA6"/><stop offset="1" stop-color="#86B686"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#4E7A52" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 184 346 Q 256 398 328 346 L 316 338 Q 256 382 196 338 Z" fill="#D7EBD2" stroke="#4E7A52" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 99.1 267.3 Q 71.8 252.3 94.0 231.3 Q 71.4 210.6 98.4 195.1 Q 81.9 170.0 112.1 161.1 Q 102.6 133.0 134.3 131.0 Q 132.3 101.7 163.5 106.8 Q 169.2 77.9 198.3 89.9 Q 211.3 63.1 236.4 81.1 Q 256.0 58.0 275.6 81.1 Q 300.7 63.1 313.7 89.9 Q 342.8 77.9 348.5 106.8 Q 379.7 101.7 377.7 131.0 Q 409.4 133.0 399.9 161.1 Q 430.1 170.0 413.6 195.1 Q 440.6 210.6 418.0 231.3 Q 440.2 252.3 412.9 267.3 L 256 260 Z" fill="#9C7A5C" stroke="#5A4030" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="170" cy="136" r="22" fill="#E7C9A3" stroke="#7A5A40" stroke-width="5"/><g transform="translate(512 0) scale(-1 1)"><circle cx="170" cy="136" r="22" fill="#E7C9A3" stroke="#7A5A40" stroke-width="5"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="222" rx="124" ry="112" fill="url(#headG)" stroke="#7A5A40" stroke-width="6"/>
+  <ellipse cx="256" cy="264" rx="42" ry="32" fill="#F8EBD6" stroke="#D6B994" stroke-width="3"/><circle cx="256" cy="246" r="12" fill="#2B1C14"/><circle cx="252" cy="242" r="3.5" fill="#FFFFFF"/>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#7A5A40" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#7A5A40" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 256 258 L 256 268" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 236 270 Q 246 285 256 272 Q 266 285 276 270" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="168" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="344" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+
+  <!-- 기분 -->
+  <path d="M 110 104 Q 113 117 126 120 Q 113 123 110 136 Q 107 123 94 120 Q 107 117 110 104 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 404 137.2 Q 406.4 147.6 416.8 150 Q 406.4 152.4 404 162.8 Q 401.6 152.4 391.2 150 Q 401.6 147.6 404 137.2 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 392 290.4 Q 393.8 298.2 401.6 300 Q 393.8 301.8 392 309.6 Q 390.2 301.8 382.4 300 Q 390.2 298.2 392 290.4 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 108 279.6 C 90.4 268.4 96.8 254 108 263.6 C 119.2 254 125.6 268.4 108 279.6 Z" fill="#F27A8A" stroke="#C24B5E" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

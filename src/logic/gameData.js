@@ -1,7 +1,7 @@
 // 기획 데이터(src/data)를 검증해 게임이 쓰는 형태로 내보낸다.
 // 게임 코드는 src/data 를 직접 읽지 않고 항상 이 모듈을 거친다.
 import { BLEND_RULE, BLEND_TEXT } from '../data/blending.js';
-import { GUESTS, MISS_DIALOGUES } from '../data/guests.js';
+import { GUESTS, MISS_DIALOGUES, OPENING_VISITS } from '../data/guests.js';
 import { INGREDIENTS } from '../data/ingredients.js';
 import { validateBlendData, validateGameData } from './validateData.js';
 
@@ -9,6 +9,7 @@ const result = validateGameData({
   guests: GUESTS,
   ingredients: INGREDIENTS,
   missDialogues: MISS_DIALOGUES,
+  openingVisits: OPENING_VISITS,
 });
 const blend = validateBlendData(BLEND_RULE, BLEND_TEXT);
 
@@ -16,6 +17,8 @@ export const GUEST_LIST = result.guests;
 export const INGREDIENT_LIST = result.ingredients;
 // 내어 드린 차가 꼭 맞지 않았을 때의 대사 { leafOnly, fruitOnly, swapped, none }
 export const MISS_LINES = result.missDialogues;
+// 처음 찾아오는 손님의 순서 [{ level, count }] — 그 뒤로는 남은 손님 중 무작위
+export const OPENING_LIST = result.opening;
 // 블렌딩 규칙 { ratio, name, blendLine, pureLine }
 export const BLEND_SETTINGS = { ratio: blend.ratio, ...blend.texts };
 export const DATA_ERRORS = [...result.errors, ...blend.errors];

@@ -5,7 +5,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { BLEND_RULE, BLEND_TEXT } from '../src/data/blending.js';
-import { GUESTS, MISS_DIALOGUES } from '../src/data/guests.js';
+import { GUESTS, MISS_DIALOGUES, OPENING_VISITS } from '../src/data/guests.js';
 import { INGREDIENTS } from '../src/data/ingredients.js';
 import { LEVEL_NAMES } from '../src/data/scripts.js';
 import { TRAIN_DATA } from '../src/data/trainData.js';
@@ -14,10 +14,11 @@ import { levelName } from '../src/logic/format.js';
 import { validateBlendData, validateGameData, validateTrainData } from '../src/logic/validateData.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
-const { guests, ingredients, missDialogues, errors, warnings } = validateGameData({
+const { guests, ingredients, missDialogues, opening, errors, warnings } = validateGameData({
   guests: GUESTS,
   ingredients: INGREDIENTS,
   missDialogues: MISS_DIALOGUES,
+  openingVisits: OPENING_VISITS,
 });
 const train = validateTrainData(TRAIN_DATA, ingredients);
 errors.push(...train.errors);
@@ -92,7 +93,8 @@ const levelSummary = levels.map((level) => `${levelName(level, LEVEL_NAMES)} ${g
 const missCount = Object.values(missDialogues).reduce((sum, lines) => sum + lines.length, 0);
 console.log('\n별빛 찻집 · 데이터 검사');
 console.log(`  손님 ${guests.length}명${levelSummary ? ` (${levelSummary})` : ''} · 재료 ${ingredients.length}가지 · 아쉬울 때 대사 ${missCount}개`);
-console.log('  방문 순서: 아직 마음을 데우지 못한 손님 중 쉬운 단계부터');
+const openingSummary = opening.map((step) => `${levelName(step.level, LEVEL_NAMES)} ${step.count}명`).join(' → ');
+console.log(`  방문 순서: ${openingSummary ? `${openingSummary} → ` : ''}그 뒤로는 아직 마음을 데우지 못한 손님 중 무작위`);
 console.log(`  표정 변화 그림(_happy) ${happyCount}/${guests.length}명 (선택 사항)`);
 console.log(`  블렌딩: 1위 열매 = 찻잎, 2위 열매 = 과일 (2위가 1위의 ${Math.round(blend.ratio * 100)}% 이상일 때) · ${ingredients.length} × ${ingredients.length} = ${ingredients.length ** 2}가지`);
 console.log(`  팽주의 학습 문장 ${trainSamples.length}개 — ${ingredients.map((ing) => `${ing.virtue} ${trainCounts[ing.id] ?? 0}`).join(', ')}`);

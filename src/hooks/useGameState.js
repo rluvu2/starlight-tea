@@ -7,7 +7,7 @@
  *   TITLE ─(첫 방문)→ INTRO ─┐
  *     └──────────────────────┴→ GUEST (Phase 1 손님 맞이: 찻잎 1 + 과일 1) ─정답 후 터치→ CROSSROADS (Phase 2 찻집 로비)
  *   찻집 문을 열면 언제나 손님 맞이가 먼저다. 로비(메인 메뉴)는 첫 손님을 배웅한 뒤부터 열린다.
- *   손님은 아직 마음을 데우지 못한 손님 중 가장 쉬운 단계(level)부터 찾아온다.
+ *   손님은 처음 순서(쉬움 2명 → 보통 2명)를 지난 뒤, 아직 마음을 데우지 못한 손님 중 무작위로 찾아온다.
  *   CROSSROADS ─[다음 손님 맞이하기]→ GUEST (새 손님)
  *   CROSSROADS ─[나를 위한 차 끓이기]→ REFLECTION (Phase 3: 고민 + 찻잎 1 + 과일 1) ─[완성하기]→ AD_GATE (Phase 3.5)
  *   AD_GATE ─광고 끝까지 시청 / 광고 없음·차단·실패→ ADVICE (Phase 4) ─터치→ CROSSROADS
@@ -23,9 +23,9 @@ import { STAR_REWARD } from '../data/rewards.js';
 import { HINT_TEMPLATE, REFLECTION_TEXT, SIP_LINES } from '../data/scripts.js';
 import { analyzeWorry, getClassifier } from '../logic/advisor.js';
 import { blendParts, PICK, tasteBlend } from '../logic/blend.js';
-import { GUEST_LIST, guestBlend, guestById, ingredientById, MISS_LINES } from '../logic/gameData.js';
+import { GUEST_LIST, guestBlend, guestById, ingredientById, MISS_LINES, OPENING_LIST } from '../logic/gameData.js';
 import { fill } from '../logic/josa.js';
-import { frontierLevel, pickNextGuest } from '../logic/pickGuest.js';
+import { pickNextGuest, stageMilestone, visitStage } from '../logic/pickGuest.js';
 import { pick, pickDifferent } from '../logic/random.js';
 import { requestRewardedAd } from '../utils/adService.js';
 
@@ -332,10 +332,8 @@ export function gameReducer(state, action) {
           ...save.collection,
           [guest.id]: { firstAt: previous?.firstAt ?? action.now, count: (previous?.count ?? 0) + 1, ...served },
         };
-        // 이 손님으로 한 단계의 손님을 모두 데웠다면, 로비에서 다음 단계가 열렸다고 알려 준다
-        const before = frontierLevel(GUEST_LIST, save.collection);
-        const after = frontierLevel(GUEST_LIST, collection);
-        const milestone = before === after ? null : after === null ? { kind: 'complete' } : { kind: 'levelUp', level: after };
+        // 이 손님으로 방문 단계가 바뀌었다면(다음 단계 열림 / 모든 단계가 섞여 옴 / 모두 데움) 로비에서 알려 준다
+        const milestone = stageMilestone(visitStage(GUEST_LIST, save.collection, OPENING_LIST), visitStage(GUEST_LIST, collection, OPENING_LIST));
         return {
           ...state,
           guest: {
@@ -487,7 +485,7 @@ export function GameProvider({ children }) {
 
   const actions = useMemo(() => {
     const nextGuest = () => {
-      const guest = pickNextGuest(GUEST_LIST, stateRef.current.save);
+      const guest = pickNextGuest(GUEST_LIST, stateRef.current.save, Math.random, OPENING_LIST);
       dispatch({ type: 'START_GUEST', guestId: guest?.id ?? null });
     };
     return {

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 가족에게 지친 기린 (guest_026) -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#F7D886"/><stop offset="1" stop-color="#E2B154"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#F4CF72"/><stop offset="1" stop-color="#E0B050"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 452 120 410 196 396 L 206 300 L 306 300 L 316 396 C 392 410 442 452 448 520 Z" fill="url(#bodyG)" stroke="#8A6420" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="226" cy="340" rx="20" ry="14" fill="#C9873E" opacity="0.85"/><ellipse cx="282" cy="372" rx="18" ry="16" fill="#C9873E" opacity="0.85"/><ellipse cx="236" cy="400" rx="16" ry="12" fill="#C9873E" opacity="0.85"/><ellipse cx="140" cy="470" rx="24" ry="16" fill="#C9873E" opacity="0.85"/><ellipse cx="360" cy="460" rx="26" ry="18" fill="#C9873E" opacity="0.85"/><ellipse cx="300" cy="492" rx="20" ry="14" fill="#C9873E" opacity="0.85"/>
+  <ellipse cx="256" cy="304" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 218 120 L 208 70" fill="none" stroke="#E0B050" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/><circle cx="206" cy="64" r="13" fill="#7A4E2A"/><path d="M 148 168 Q 96 148 82 178 Q 108 198 152 192 Z" fill="#F2C868" stroke="#8A6420" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><g transform="translate(512 0) scale(-1 1)"><path d="M 218 120 L 208 70" fill="none" stroke="#E0B050" stroke-width="14" stroke-linejoin="round" stroke-linecap="round"/><circle cx="206" cy="64" r="13" fill="#7A4E2A"/><path d="M 148 168 Q 96 148 82 178 Q 108 198 152 192 Z" fill="#F2C868" stroke="#8A6420" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="204" rx="112" ry="104" fill="url(#headG)" stroke="#8A6420" stroke-width="6"/>
+  <ellipse cx="196" cy="140" rx="16" ry="11" fill="#C9873E" opacity="0.8"/><ellipse cx="316" cy="136" rx="14" ry="10" fill="#C9873E" opacity="0.8"/><ellipse cx="176" cy="250" rx="12" ry="9" fill="#C9873E" opacity="0.8"/><ellipse cx="338" cy="246" rx="13" ry="9" fill="#C9873E" opacity="0.8"/>
+  <ellipse cx="256" cy="272" rx="72" ry="48" fill="#F7E2B8" stroke="#C9A66A" stroke-width="3"/><ellipse cx="238" cy="266" rx="6" ry="4" fill="#7A4E2A"/><ellipse cx="274" cy="266" rx="6" ry="4" fill="#7A4E2A"/>
+
+  <!-- 표정 -->
+  <path d="M 190 170 Q 210 166 226 156" fill="none" stroke="#8A6420" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 322 170 Q 302 166 286 156" fill="none" stroke="#8A6420" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="210" cy="196" rx="14" ry="16" fill="#2B1C14"/><circle cx="214" cy="191" r="4.6" fill="#FFFFFF"/><circle cx="206" cy="202" r="2" fill="#FFFFFF"/><ellipse cx="302" cy="196" rx="14" ry="16" fill="#2B1C14"/><circle cx="306" cy="191" r="4.6" fill="#FFFFFF"/><circle cx="298" cy="202" r="2" fill="#FFFFFF"/><path d="M 241 304 Q 256 292 271 304" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 216 216 Q 225 229 222 236 A 7.5 7.5 0 0 1 208.5 233 Q 209 227 216 216 Z" fill="#9FD8F5" stroke="#5E9FC2" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 296 216 Q 303.2 226.4 300.8 232 A 6 6 0 0 1 290 229.6 Q 290.4 224.8 296 216 Z" fill="#9FD8F5" stroke="#5E9FC2" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="164" cy="246" rx="18" ry="10" fill="#E8968A" opacity="0.45"/><ellipse cx="348" cy="246" rx="18" ry="10" fill="#E8968A" opacity="0.45"/>
+
+  <!-- 기분 -->
+  <path d="M 232 112 L 232 138" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/><path d="M 246 112 L 246 138" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/><path d="M 260 112 L 260 138" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/><path d="M 274 112 L 274 138" fill="none" stroke="#7C6FA6" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round" opacity="0.55" stroke-dasharray="6 5"/>
+</svg>

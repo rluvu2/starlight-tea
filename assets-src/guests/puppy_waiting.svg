@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 주인을 기다리는 강아지 (guest_008) -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#F0CFA0"/><stop offset="1" stop-color="#D3A36E"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#E9C597"/><stop offset="1" stop-color="#CF9F68"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#8A5A36" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 186 338 Q 256 378 326 338 L 330 352 Q 256 394 182 352 Z" fill="#D9534F" stroke="#8A3A30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="256" cy="386" r="13" fill="#F2C14E" stroke="#8A3A30" stroke-width="4"/><circle cx="256" cy="386" r="4" fill="#8A3A30"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="220" rx="130" ry="118" fill="url(#headG)" stroke="#8A5A36" stroke-width="6"/>
+  <ellipse cx="312" cy="210" rx="32" ry="28" fill="#C48A58" opacity="0.85"/><path d="M 150 128 C 98 140 84 236 106 298 C 120 334 162 320 172 286 C 184 246 188 168 150 128 Z" fill="#A8744A" stroke="#6E4630" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><g transform="translate(512 0) scale(-1 1)"><path d="M 150 128 C 98 140 84 236 106 298 C 120 334 162 320 172 286 C 184 246 188 168 150 128 Z" fill="#A8744A" stroke="#6E4630" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/></g>
+  <ellipse cx="256" cy="266" rx="58" ry="43" fill="#F7E6CC" stroke="#D2B08A" stroke-width="3"/><path d="M 236 244 Q 256 234 276 244 Q 274 262 256 266 Q 238 262 236 244 Z" fill="#3B2619"/><ellipse cx="249" cy="245" rx="7" ry="3" fill="#FFFFFF" opacity="0.55"/>
+
+  <!-- 표정 -->
+  <path d="M 183 188 Q 203 184 219 174" fill="none" stroke="#6E4630" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 188 Q 309 184 293 174" fill="none" stroke="#6E4630" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="203" cy="214" rx="14" ry="16" fill="#2B1C14"/><circle cx="207" cy="209" r="4.6" fill="#FFFFFF"/><circle cx="199" cy="220" r="2" fill="#FFFFFF"/><ellipse cx="309" cy="214" rx="14" ry="16" fill="#2B1C14"/><circle cx="313" cy="209" r="4.6" fill="#FFFFFF"/><circle cx="305" cy="220" r="2" fill="#FFFFFF"/><path d="M 256 268 L 256 278" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 241 292 Q 256 280 271 292" fill="none" stroke="#3B2619" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 209 234 Q 218 247 215 254 A 7.5 7.5 0 0 1 201.5 251 Q 202 245 209 234 Z" fill="#9FD8F5" stroke="#5E9FC2" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 303 234 Q 310.2 244.4 307.8 250 A 6 6 0 0 1 297 247.6 Q 297.4 242.8 303 234 Z" fill="#9FD8F5" stroke="#5E9FC2" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="168" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.45"/><ellipse cx="344" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.45"/>
+
+  <!-- 기분 -->
+</svg>

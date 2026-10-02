@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 퉁명스러워진 늑대 (guest_030) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#ADB2BC"/><stop offset="1" stop-color="#858B96"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5E6372"/><stop offset="1" stop-color="#444856"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#2E313A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 164 356 Q 168 330 214 336 Q 256 378 298 336 Q 344 330 348 356 Q 312 402 256 402 Q 200 402 164 356 Z" fill="#555A68" stroke="#2E313A" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 236 388 L 230 438 M 276 388 L 282 438" fill="none" stroke="#D8DCE4" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="230" cy="442" r="5" fill="#D8DCE4" stroke="#2E313A" stroke-width="2"/><circle cx="282" cy="442" r="5" fill="#D8DCE4" stroke="#2E313A" stroke-width="2"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 156 162 L 138 58 L 220 120 Z" fill="#8C919C" stroke="#4A4E58" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 162 148 L 152 86 L 202 122 Z" fill="#E7DCDC"/><path d="M 132 214 L 108 236 L 134 240 L 116 262 L 146 258" fill="#ADB2BC" stroke="#4A4E58" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><g transform="translate(512 0) scale(-1 1)"><path d="M 156 162 L 138 58 L 220 120 Z" fill="#8C919C" stroke="#4A4E58" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 162 148 L 152 86 L 202 122 Z" fill="#E7DCDC"/><path d="M 132 214 L 108 236 L 134 240 L 116 262 L 146 258" fill="#ADB2BC" stroke="#4A4E58" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/></g>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="220" rx="130" ry="118" fill="url(#headG)" stroke="#4A4E58" stroke-width="6"/>
+  <path d="M 176 250 Q 200 312 256 316 Q 312 312 336 250 Q 300 276 256 272 Q 212 276 176 250 Z" fill="#ECEEF2"/>
+  <ellipse cx="256" cy="268" rx="54" ry="44" fill="#E9EBEF" stroke="#B8BDC6" stroke-width="3"/><path d="M 236 244 Q 256 234 276 244 Q 274 262 256 266 Q 238 262 236 244 Z" fill="#2E2B30"/><ellipse cx="249" cy="245" rx="7" ry="3" fill="#FFFFFF" opacity="0.55"/>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#2E313A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#2E313A" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 256 268 L 256 278" fill="none" stroke="#2E2B30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 236 280 Q 246 295 256 282 Q 266 295 276 280" fill="none" stroke="#2E2B30" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="168" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="344" cy="262" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+
+  <!-- 기분 -->
+  <path d="M 110 115.6 Q 112.7 127.3 124.4 130 Q 112.7 132.7 110 144.4 Q 107.3 132.7 95.6 130 Q 107.3 127.3 110 115.6 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 406 127.2 Q 408.4 137.6 418.8 140 Q 408.4 142.4 406 152.8 Q 403.6 142.4 393.2 140 Q 403.6 137.6 406 127.2 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>

@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- 이사 온 아기 펭귄 (guest_007) · 마음이 따뜻해진 표정 -->
+  <defs><radialGradient id="headG" cx="0.42" cy="0.35" r="0.78"><stop offset="0" stop-color="#4A5470"/><stop offset="1" stop-color="#2C3247"/></radialGradient><linearGradient id="bodyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3D4660"/><stop offset="1" stop-color="#2A3046"/></linearGradient></defs>
+
+  <!-- 몸통 -->
+  <path d="M 64 520 C 70 420 128 362 204 344 L 308 344 C 384 362 442 420 448 520 Z" fill="url(#bodyG)" stroke="#1E2233" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M 186 520 C 190 432 214 374 256 368 C 298 374 322 432 326 520 Z" fill="#F6F3EC" stroke="#C9C1B4" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><path d="M 172 334 Q 256 384 340 334 L 348 360 Q 256 414 164 360 Z" fill="#E0605A" stroke="#A83E3A" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 286 368 L 316 452 L 288 462 L 268 378 Z" fill="#E0605A" stroke="#A83E3A" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"/><path d="M 278 398 L 302 390 M 284 420 L 308 412" fill="none" stroke="#F7D9A8" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 196 356 Q 200 372 206 382 M 236 368 Q 238 382 240 392" fill="none" stroke="#F7D9A8" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+  <ellipse cx="256" cy="338" rx="74" ry="14" fill="#000000" opacity="0.17"/>
+
+  <!-- 귀·뒤쪽 -->
+  <path d="M 246 110 Q 238 86 252 80 M 262 108 Q 270 86 284 92" fill="none" stroke="#1E2233" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 머리 -->
+  <ellipse cx="256" cy="220" rx="130" ry="118" fill="url(#headG)" stroke="#1E2233" stroke-width="6"/>
+  <path d="M 256 150 C 226 118 152 130 150 200 C 148 268 196 316 256 318 C 316 316 364 268 362 200 C 360 130 286 118 256 150 Z" fill="#FFFDF8"/>
+  <path d="M 230 250 Q 256 236 282 250 Q 270 276 256 278 Q 242 276 230 250 Z" fill="#F2A33C" stroke="#B8701E" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+  <!-- 표정 -->
+  <path d="M 183 184 Q 203 172 223 184" fill="none" stroke="#2C3247" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 329 184 Q 309 172 289 184" fill="none" stroke="#2C3247" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 186 218 Q 203 198 220 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><path d="M 292 218 Q 309 198 326 218" fill="none" stroke="#2B1C14" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"/><ellipse cx="174" cy="266" rx="18" ry="10" fill="#E8968A" opacity="0.72"/><ellipse cx="338" cy="266" rx="18" ry="10" fill="#E8968A" opacity="0.72"/>
+
+  <!-- 기분 -->
+  <path d="M 110 104 Q 113 117 126 120 Q 113 123 110 136 Q 107 123 94 120 Q 107 117 110 104 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 404 137.2 Q 406.4 147.6 416.8 150 Q 406.4 152.4 404 162.8 Q 401.6 152.4 391.2 150 Q 401.6 147.6 404 137.2 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 392 290.4 Q 393.8 298.2 401.6 300 Q 393.8 301.8 392 309.6 Q 390.2 301.8 382.4 300 Q 390.2 298.2 392 290.4 Z" fill="#FFD86B" stroke="#E0A93A" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><path d="M 394 130.8 C 374.2 118.2 381.4 102 394 112.8 C 406.6 102 413.8 118.2 394 130.8 Z" fill="#F27A8A" stroke="#C24B5E" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+</svg>
