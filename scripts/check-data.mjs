@@ -1,6 +1,6 @@
 // 기획 데이터·배포 설정 검사: npm run check  (npm run build 전에 자동으로 실행됩니다)
 // guests.js 의 빠진 항목·중복 ID·잘못된 재료 번호·난이도·없는 그림 파일, 블렌딩 규칙,
-// 팽주의 학습 문장 수, 광고·도메인·썸네일 설정, 정책 페이지의 미입력 항목을 알려 준다.
+// 팽주의 학습 문장 수, 팽주의 찻장(쿠팡 링크), 광고·도메인·썸네일 설정, 정책 페이지의 미입력 항목을 알려 준다.
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -8,9 +8,11 @@ import { BLEND_RULE, BLEND_TEXT } from '../src/data/blending.js';
 import { GUESTS, MISS_DIALOGUES, OPENING_VISITS } from '../src/data/guests.js';
 import { INGREDIENTS } from '../src/data/ingredients.js';
 import { LEVEL_NAMES } from '../src/data/scripts.js';
+import { SHOP } from '../src/data/shop.js';
 import { TRAIN_DATA } from '../src/data/trainData.js';
 import { happyFileName } from '../src/logic/fileNames.js';
 import { levelName } from '../src/logic/format.js';
+import { validateShopData } from '../src/logic/shop.js';
 import { validateBlendData, validateGameData, validateTrainData } from '../src/logic/validateData.js';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -29,6 +31,14 @@ warnings.push(...blend.warnings);
 const trainCounts = train.counts;
 const trainSamples = train.samples;
 const notes = [];
+const shop = validateShopData(SHOP, ingredients);
+errors.push(...shop.errors);
+warnings.push(...shop.warnings);
+notes.push(
+  shop.enabled
+    ? `팽주의 찻장: 쿠팡 파트너스 링크 찻잎 ${shop.count}/${ingredients.length}${SHOP.teaware ? ' + 다구' : ''}`
+    : '팽주의 찻장: 꺼져 있어요 (src/data/shop.js 의 enabled)',
+);
 
 // ── 그림 파일 ──
 let happyCount = 0;

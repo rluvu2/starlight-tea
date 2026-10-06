@@ -388,4 +388,39 @@ assert.equal(await scenario(() => { window.adBreak = (o) => o.adBreakDone({ brea
 assert.equal(await scenario(() => { window.adBreak = (o) => o.adBreakDone({ breakStatus: 'frequencyCapped' }); }), 'reward', '빈도 제한');
 assert.equal(await scenario(() => { window.adBreak = () => { throw new Error('boom'); }; }), 'reward', '예외');
 console.log('✓ 광고: 스크립트 없음/차단/끝까지 봄/중간에 닫음/재고 없음/빈도 제한/예외');
+
+// ── 4. 팽주의 찻장 (쿠팡 파트너스) ──
+const { shopFor, validateShopData } = await import(root + 'logic/shop.js');
+const { SHOP } = await import(root + 'data/shop.js');
+for (let id = 1; id <= 9; id += 1) {
+  const item = shopFor({ leafId: id, fruitId: id });
+  assert.ok(item, `${ingredientById(id).name}: 찻잎마다 찻장이 있다`);
+  assert.equal(item.leaf.id, id, '찻장은 팽주의 블렌딩 중 찻잎을 소개한다');
+  assert.match(item.link, /^https:\/\/link\.coupang\.com\/a\/\w+$/);
+  assert.ok(item.water && item.time, '우림 노트');
+  assert.ok(item.disclosure.includes('쿠팡 파트너스'), '고지 문구');
+}
+assert.equal(new Set([1, 2, 3, 4, 5, 6, 7, 8, 9].map((id) => shopFor({ leafId: id, fruitId: 1 }).link)).size, 9, '찻잎마다 다른 링크');
+const blackStraw = shopFor({ leafId: 1, fruitId: 8 });
+assert.equal(blackStraw.link, 'https://link.coupang.com/a/hCHZRH1f0m', '홍차');
+assert.equal(blackStraw.text.tag, '오늘의 홍차, 집에서도 우려 볼까요?');
+assert.equal(blackStraw.text.blendTip, '우린 홍차에 배를 조금 곁들이면 오늘 밤의 홍차 배차가 돼요.', '과일은 2위 열매, 조사도 맞춘다');
+assert.equal(blackStraw.text.buyButton, '쿠팡에서 홍차 보기');
+assert.equal(shopFor({ leafId: 3, fruitId: 4 }).text.intro.startsWith('오늘 밤 권해 드린 캐모마일을'), true, '받침 있으면 을');
+assert.equal(shopFor({ leafId: 6, fruitId: 7 }).text.blendTip, '우린 녹차에 석류를 조금 곁들이면 오늘 밤의 녹차 석류차가 돼요.');
+assert.equal(shopFor({ leafId: 9, fruitId: 9 }).link, 'https://link.coupang.com/a/hCIekA3Uo8', '말차');
+assert.equal(blackStraw.teaware, 'https://link.coupang.com/a/hCIe9qGbBs', '다구');
+assert.equal(shopFor({ leafId: 1, fruitId: 99 }), null, '없는 재료');
+assert.equal(shopFor(null), null);
+assert.equal(shopFor({ leafId: 1, fruitId: 1 }, { ...SHOP, enabled: false }), null, '찻장을 끄면 꼬리표도 없다');
+assert.equal(shopFor({ leafId: 1, fruitId: 1 }, { ...SHOP, disclosure: '' }), null, '고지 문구가 없으면 띄우지 않는다');
+assert.equal(shopFor({ leafId: 2, fruitId: 1 }, { ...SHOP, leaves: { ...SHOP.leaves, 2: { link: '' } } }), null, '링크가 빈 찻잎은 꼬리표 없음');
+assert.equal(shopFor({ leafId: 1, fruitId: 1 }, { ...SHOP, teaware: '' }).teaware, null, '다구 링크는 없어도 된다');
+const shopCheck = validateShopData(SHOP, INGREDIENTS);
+assert.deepEqual([shopCheck.errors, shopCheck.warnings, shopCheck.count], [[], [], 9]);
+const badShop = validateShopData({ ...SHOP, leaves: { ...SHOP.leaves, 2: { link: 'coupang' }, 5: {} }, disclosure: '' }, INGREDIENTS);
+assert.equal(badShop.count, 7);
+assert.ok(badShop.errors.some((e) => e.where.includes('[2]')) && badShop.errors.some((e) => e.where.includes('disclosure')));
+assert.ok(badShop.warnings.some((w) => w.includes('[5]')));
+console.log('✓ 찻장: 찻잎 9가지 쿠팡 링크·우림 노트·조사, 끄기/고지 문구 없음/빈 링크/다구, 데이터 검사');
 console.log('\n모든 테스트 통과');

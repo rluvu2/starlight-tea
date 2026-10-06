@@ -1,14 +1,19 @@
 // Phase 4: 팽주의 조언 — Phase 3 에서 미리 계산해 둔 블렌딩(1위 찻잎 + 2위 과일)과 조언을 보여 준다
-import { m, useReducedMotion } from 'framer-motion';
-import { useEffect } from 'react';
+// 조언이 다 나오면 카드 아래에 '팽주의 찻장' 꼬리표가 살며시 매달린다 (누른 분만 찻장이 열린다)
+import { AnimatePresence, m, useReducedMotion } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
 import { playSfx } from '../../audio/engine.js';
+import { ChevronRightIcon } from '../../components/icons.jsx';
+import ShopSheet from '../../components/ShopSheet.jsx';
 import { GlassCup, Steam } from '../../components/teaware.jsx';
 import { ADVICE_TEXT, OWNER_NAME } from '../../data/scripts.js';
 import { useGameState } from '../../hooks/useGameState.js';
 import { useTypewriter } from '../../hooks/useTypewriter.js';
 import { blendColor, blendName, blendParts } from '../../logic/blend.js';
 import { ingredientById } from '../../logic/gameData.js';
+import { shopFor } from '../../logic/shop.js';
 import { ingredientIconUrl } from '../../utils/assets.js';
+import { haptic } from '../../utils/haptics.js';
 
 /** 마음의 결 상위 3개 — 찻잎(1위)·과일(2위)로 쓰인 마음에 표시를 붙인다 */
 function MoodBars({ mood, recommended }) {
@@ -67,12 +72,37 @@ function BlendCup({ parts, color }) {
   );
 }
 
+/** 조언 카드 오른쪽 아래에 매달리는 찻잎 꼬리표 → 팽주의 찻장 */
+function ShopTag({ shop, onOpen }) {
+  return (
+    <m.button
+      type="button"
+      onClick={() => {
+        playSfx('page');
+        haptic('light');
+        onOpen();
+      }}
+      className="pointer-events-auto absolute -bottom-3.5 right-3 flex max-w-[calc(100%-1.5rem)] items-center gap-1 rounded-full border border-lamp-300/35 bg-night-700 py-[3px] pl-1 pr-2 text-[12px] text-lamp-100 shadow-[0_6px_18px_-6px_rgba(245,184,96,0.55)]"
+      style={{ transformOrigin: '85% 0%' }}
+      initial={{ opacity: 0, y: -6, rotate: -3 }}
+      animate={{ opacity: 1, y: 0, rotate: 0 }}
+      transition={{ duration: 0.7, delay: 0.9, ease: 'easeOut' }}
+    >
+      <img src={ingredientIconUrl(shop.leaf.icon)} alt="" draggable={false} className="h-5 w-5 shrink-0" />
+      <span className="truncate font-serif">{shop.text.tag}</span>
+      <ChevronRightIcon className="h-3.5 w-3.5 shrink-0 text-lamp-300" />
+    </m.button>
+  );
+}
+
 export default function AdvicePhase() {
   const { state } = useGameState();
   const { advice } = state;
   const reduceMotion = useReducedMotion();
   const { shown, done } = useTypewriter(advice?.message ?? '', { instant: reduceMotion, speed: 34, skippable: true });
   const parts = blendParts(advice?.recommended);
+  const shop = useMemo(() => shopFor(advice?.recommended), [advice]);
+  const [shopOpen, setShopOpen] = useState(false);
 
   useEffect(() => {
     playSfx('full');
@@ -82,8 +112,9 @@ export default function AdvicePhase() {
   const virtues = parts.pure ? parts.leaf.virtue : `${parts.leaf.virtue} + ${parts.fruit.virtue}`;
 
   return (
+    // 화면 터치(z-40) 위에 올라와 있지만 pointer-events-none 이라 터치는 아래로 지나간다. 꼬리표만 눌린다
     <m.div
-      className="pointer-events-none absolute inset-0 z-30 flex flex-col items-center justify-center bg-night-950/75 px-5 text-center backdrop-blur-[3px]"
+      className="pointer-events-none absolute inset-0 z-50 flex flex-col items-center justify-center bg-night-950/75 px-5 text-center backdrop-blur-[3px]"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -94,7 +125,9 @@ export default function AdvicePhase() {
       <p className="mt-0.5 font-serif text-[16px] text-lamp-100">{blendName(advice.recommended)}</p>
       <p className="text-[11px] tracking-[0.12em] text-ink-400">{virtues}</p>
 
-      <div className="relative mt-3 w-full max-w-[340px] rounded-[22px] border border-white/10 bg-night-800/90 px-4 pb-3.5 pt-4 text-left shadow-[0_18px_44px_-20px_rgba(0,0,0,0.9)]">
+      <div
+        className={`relative mt-3 w-full max-w-[340px] rounded-[22px] border border-white/10 bg-night-800/90 px-4 pb-3.5 pt-4 text-left shadow-[0_18px_44px_-20px_rgba(0,0,0,0.9)] ${shop ? 'mb-3' : ''}`}
+      >
         <span className="absolute -top-3 left-4 rounded-full bg-mint-200 px-3 py-0.5 font-serif text-[12.5px] font-bold text-night-900 shadow-md">
           {OWNER_NAME}
         </span>
@@ -105,17 +138,21 @@ export default function AdvicePhase() {
           <p className="mt-1 break-keep text-[12.5px] leading-relaxed text-ink-300">{advice.blendLine}</p>
           <p className="mt-2 break-keep font-serif text-[15px] leading-[1.7] text-lamp-100">“{advice.comfort}”</p>
         </m.div>
+        {shop && done && <ShopTag shop={shop} onOpen={() => setShopOpen(true)} />}
       </div>
 
       {advice.mood.length > 0 && <MoodBars mood={advice.mood} recommended={advice.recommended} />}
 
+      {/* 키가 작은 화면에서는 꼬리표가 이 자리를 쓴다 (아래 [찻집으로 돌아가기] 버튼이 같은 안내를 한다) */}
       <m.p
-        className="mt-2 text-[11px] text-ink-400"
+        className={`mt-2 text-[11px] text-ink-400 ${shop ? '[@media(max-height:700px)]:hidden' : ''}`}
         animate={{ opacity: done ? [0.4, 1, 0.4] : 0 }}
         transition={done ? { repeat: Infinity, duration: 2.4 } : { duration: 0.2 }}
       >
         {ADVICE_TEXT.backHint}
       </m.p>
+
+      <AnimatePresence>{shopOpen && shop && <ShopSheet key="shop" shop={shop} onClose={() => setShopOpen(false)} />}</AnimatePresence>
     </m.div>
   );
 }

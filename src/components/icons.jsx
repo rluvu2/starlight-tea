@@ -119,6 +119,37 @@ export function SparkleIcon({ className = 'h-4 w-4' }) {
   );
 }
 
+// 새 창으로 열리는 바깥 링크 (팽주의 찻장)
+export function ExternalIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M14 4h6v6" />
+      <path d="M20 4 11 13" />
+      <path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10" />
+    </svg>
+  );
+}
+
+// 물 온도 (우림 노트)
+export function ThermometerIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <path d="M10 13.5V5a2 2 0 0 1 4 0v8.5a4 4 0 1 1-4 0Z" />
+      <circle cx="12" cy="16.8" r="1.6" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+// 우리는 시간 (우림 노트)
+export function TimerIcon({ className = 'h-4 w-4' }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} {...base}>
+      <circle cx="12" cy="13.5" r="7.5" />
+      <path d="M12 9.5v4l2.5 1.6M10 3h4" />
+    </svg>
+  );
+}
+
 export function HandPressIcon({ className = 'h-6 w-6' }) {
   return (
     <svg viewBox="0 0 24 24" className={className} {...base}>
