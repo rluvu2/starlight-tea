@@ -68,7 +68,7 @@ VITE_ADSENSE_CLIENT=                            # AdSense 승인 후 입력 (비
 - 개발 서버(`npm run dev`)에서는 `data-adbreak-test="on"` **테스트 광고**가 나오고, 배포 빌드에서는 이 속성이 **자동으로 제거**됩니다.
 - 게시자 ID가 비어 있으면(지금 상태) 광고 스크립트를 넣지 않습니다. 버튼은 "조언 듣기"로 바뀌고 광고 없이 조언이 열립니다.
 - 유럽 등 동의가 필요한 지역의 유저에게는 AdSense 콘솔의 **개인정보 보호 및 메시지**에서 동의 메시지를 켜 주세요.
-- **AdSense 심사용 페이지:** `public/about.html`(게임 소개)과 `public/privacy.html`(개인정보처리방침, 광고 쿠키 고지 포함). **배포 전에 두 파일의 `[운영자 이름]`, `[문의 이메일]` 빈칸을 채워 주세요.** 빈칸이 남아 있으면 `npm run check`가 알려 줍니다.
+- **AdSense 심사용 페이지:** `public/about.html`(게임 소개)과 `public/privacy.html`(개인정보처리방침, 광고 쿠키 고지 포함). 문의 창구는 스튜디오 사이트의 [문의 페이지](https://rluvu2.github.io/contact.html)(GitHub 이슈)로 이어 두었습니다. 나중에 빈칸(`data-placeholder`)을 다시 넣으면 `npm run check`가 알려 줍니다.
 
 ### 팽주의 찻장 — 쿠팡 파트너스 (`src/data/shop.js`)
 
